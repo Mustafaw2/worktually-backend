@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_yasg',
-    'employees'
+    'authentication',
+    'employee',
+    'django_extensions'
 ]
 
 MIDDLEWARE = [
@@ -146,15 +148,19 @@ REST_FRAMEWORK = {
 
 
 
-AUTH_USER_MODEL = 'employees.Employee'
+AUTH_USER_MODEL = 'authentication.Employee'
 
 
+# Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'your_smtp_host'
-# EMAIL_PORT = your_smtp_port
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your_email'
-EMAIL_HOST_PASSWORD = 'your_email_password'
-DEFAULT_FROM_EMAIL = 'your_default_from_email'
+EMAIL_HOST_USER = 'mustafazaidi840@gmail.com'
+EMAIL_HOST_PASSWORD = 'fstm fuao nesc pdpl'
+
+# Default from email
+DEFAULT_FROM_EMAIL = 'mustafazaidi840@gmail.com'
+
 
 

@@ -15,11 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path,include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from employees.views import PasswordResetView, PasswordResetConfirmView, RegisterView, LoginView, LogoutView
+from authentication.views import  RegisterView, LoginView, LogoutView, ForgetPasswordView, VerifyOTPView, ResetPasswordView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -36,14 +36,16 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/password-reset/', PasswordResetView.as_view(), name='password-reset'),
-    path('api/password-reset-confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
-    path('api/register/', RegisterView.as_view(), name='register'),
-    path('api/login/', LoginView.as_view(), name='login'),
-    path('api/logout/', LogoutView.as_view(), name='logout'),
+    path('api/employees/register/', RegisterView.as_view(), name='register'),
+    path('api/employees/login/', LoginView.as_view(), name='login'),
+    path('api/employees/logout/', LogoutView.as_view(), name='logout'),
+    path('api/employees/forget-password/', ForgetPasswordView.as_view(), name='forget-password'),
+    path('api/employees/verify-otp/', VerifyOTPView.as_view(), name='verify-otp'),
+    path('api/employees/reset-password/', ResetPasswordView.as_view(), name='reset-password'),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('api/', include('employee.urls'))
 ]
 
 
