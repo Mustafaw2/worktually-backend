@@ -3,6 +3,7 @@ from django.shortcuts import render
 from rest_framework import generics
 from .models import UserProfile, Education, Experience, Dependent, Skill
 from .serializers import UserProfileSerializer, EducationSerializer, ExperienceSerializer, DependentSerializer, SkillSerializer
+from .modules.education_experience.views import EditEducationView, AddEducationView, DeleteEducationView, EducationsListView
 
 class EmployeesList(generics.ListAPIView):
     queryset = UserProfile.objects.all()
@@ -43,13 +44,13 @@ class EditExperience(generics.RetrieveUpdateDestroyAPIView):
     queryset = Experience.objects.all()
     serializer_class = ExperienceSerializer
 
-class EducationsList(generics.ListCreateAPIView):
-    queryset = Education.objects.all()
-    serializer_class = EducationSerializer
+# class EducationsList(generics.ListCreateAPIView):
+#     queryset = Education.objects.all()
+#     serializer_class = EducationSerializer
 
-class EditEducation(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Education.objects.all()
-    serializer_class = EducationSerializer
+# class EditEducation(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Education.objects.all()
+#     serializer_class = EducationSerializer
 
 class DependentsList(generics.ListCreateAPIView):
     queryset = Dependent.objects.all()
