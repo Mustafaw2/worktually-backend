@@ -30,7 +30,7 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-class Employee(AbstractBaseUser):
+class User(AbstractBaseUser):
     email = models.EmailField(verbose_name='email', max_length=255, unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)

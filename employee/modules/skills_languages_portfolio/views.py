@@ -22,7 +22,7 @@ class AddSkillView(APIView):
             serializer.save(user=request.user)
             return Response({"message": "Skill added successfully.", "data": serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+1214
 class DeleteSkillView(APIView):
     permission_classes = [IsAuthenticated]
 

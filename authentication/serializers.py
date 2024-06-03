@@ -1,18 +1,18 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import Employee, OTP
+from .models import User, OTP
 from rest_framework_simplejwt.tokens import RefreshToken
 
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Employee
+        model = User
         fields = ['id', 'first_name', 'last_name', 'email', 'phone_number']
 
 class RegisterSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
 
     class Meta:
-        model = Employee
+        model = User
         fields = ['first_name', 'last_name', 'email', 'phone_number', 'password', 'confirm_password']
         extra_kwargs = {'password': {'write_only': True}}
 
@@ -23,7 +23,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('confirm_password')
-        return Employee.objects.create_user(**validated_data)
+        return User.objects.create_user(**validated_data)
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -51,7 +51,7 @@ class ForgetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
     def validate_email(self, value):
-        if not Employee.objects.filter(email=value).exists():
+        if not User.objects.filter(email=value).exists():
             raise serializers.ValidationError("No user is associated with this email.")
         return value
 
@@ -84,7 +84,7 @@ class ResetPasswordRequestSerializer(serializers.Serializer):
     def save(self):
         validated_data = self.validated_data
         otp_instance = OTP.objects.get(email=validated_data['email'], reset_token=validated_data['token'])
-        employee = Employee.objects.get(email=validated_data['email'])
+        employee = User.objects.get(email=validated_data['email'])
         employee.set_password(validated_data['new_password'])
         employee.save()
         # Invalidate the OTP and token after successful password reset

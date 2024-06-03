@@ -23,7 +23,7 @@ class RegisterView(APIView):
             # Generate tokens for the newly registered employee
             refresh = RefreshToken.for_user(employee)
             return Response({
-                'message': 'Employee registered successfully',
+                'message': 'User registered successfully',
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
             }, status=status.HTTP_201_CREATED)
@@ -75,10 +75,6 @@ class ForgetPasswordView(APIView):
             email = serializer.validated_data['email']
             otp_code = OTP.generate_otp()
             OTP.objects.create(email=email, otp=otp_code)
-            print(f"EMAIL_HOST: {settings.EMAIL_HOST}")
-            print(f"EMAIL_PORT: {settings.EMAIL_PORT}")
-            print(f"EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
-            print(f"EMAIL_USE_TLS: {settings.EMAIL_USE_TLS}")
             send_mail(
                 'Your OTP Code',
                 f'Your OTP code is {otp_code}',
