@@ -1,21 +1,42 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import login, authenticate
-from .serializers import RegisterSerializer, LoginSerializer, LogoutSerializer, EmployeeSerializer, ForgetPasswordSerializer, VerifyOTPSerializer, ResetPasswordRequestSerializer
-from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth import logout
+from django.contrib.auth import login, authenticate, logout
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from django.conf import settings
-Employee = get_user_model()
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from .serializers import (
+    RegisterSerializer, LoginSerializer, LogoutSerializer, 
+    EmployeeSerializer, ForgetPasswordSerializer, VerifyOTPSerializer, 
+    ResetPasswordRequestSerializer
+)
 from .models import OTP
+
+Employee = get_user_model()
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=RegisterSerializer,
+        responses={
+            201: openapi.Response(
+                description="User registered successfully",
+                examples={
+                    'application/json': {
+                        'message': 'User registered successfully',
+                        'refresh': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...',
+                        'access': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...'
+                    }
+                }
+            ),
+            400: "Bad Request"
+        }
+    )
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -33,6 +54,23 @@ class RegisterView(APIView):
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=LoginSerializer,
+        responses={
+            200: openapi.Response(
+                description="Login successful",
+                examples={
+                    'application/json': {
+                        'message': 'Login successful',
+                        'refresh': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...',
+                        'access': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...'
+                    }
+                }
+            ),
+            401: "Invalid email or password",
+            400: "Bad Request"
+        }
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -58,6 +96,13 @@ class LoginView(APIView):
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=LogoutSerializer,
+        responses={
+            200: "Logout successful",
+            400: "Bad Request"
+        }
+    )
     def post(self, request):
         serializer = LogoutSerializer(data=request.data)
         if serializer.is_valid():
@@ -69,6 +114,13 @@ class LogoutView(APIView):
 class ForgetPasswordView(APIView):
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=ForgetPasswordSerializer,
+        responses={
+            200: "OTP has been sent to your email.",
+            400: "Bad Request"
+        }
+    )
     def post(self, request):
         serializer = ForgetPasswordSerializer(data=request.data)
         if serializer.is_valid():
@@ -88,6 +140,13 @@ class ForgetPasswordView(APIView):
 class VerifyOTPView(APIView):
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=VerifyOTPSerializer,
+        responses={
+            200: "OTP verified successfully. A password reset link has been sent to your email.",
+            400: "Bad Request"
+        }
+    )
     def post(self, request):
         serializer = VerifyOTPSerializer(data=request.data)
         if serializer.is_valid():
@@ -108,14 +167,16 @@ class VerifyOTPView(APIView):
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=ResetPasswordRequestSerializer,
+        responses={
+            200: "Password reset successfully.",
+            400: "Bad Request"
+        }
+    )
     def post(self, request):
         serializer = ResetPasswordRequestSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Password reset successfully."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
-
-    
-

@@ -1,8 +1,8 @@
 from django.db import models
-from django.conf import settings
+from employee.models import Employee
 
 class Education(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='educations')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='educations')
     degree_title = models.CharField(max_length=100)
     degree_type = models.CharField(max_length=50)
     score = models.CharField(max_length=20)
@@ -15,7 +15,7 @@ class Education(models.Model):
         return f"{self.degree_title} from {self.institute_name}"
 
 class Experience(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='experiences')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='experiences')
     job_title = models.CharField(max_length=100)
     company_name = models.CharField(max_length=100)
     job_type = models.CharField(max_length=50, choices=[('Full-time', 'Full-time'), ('Part-time', 'Part-time'), ('Contract', 'Contract')])

@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from .models import UserProfile, Experience, Dependent, Skill
+from .models import Employee, Experience, Dependent
 from .modules.education_experience.serializers import EducationSerializer
 from rest_framework import serializers
-from .models import UserProfile, Role
+from .models import Employee, Role
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -11,13 +11,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
     role = serializers.CharField(source='role.name', required=False)  # This allows inputting role as a string
 
     class Meta:
-        model = UserProfile
-        fields = [
-            'user', 'first_name', 'last_name', 'father_name', 'email', 'date_of_birth', 'id_number', 
-            'marital_status', 'gender', 'address', 'country', 'state', 'city', 'postal_code', 'picture', 
-            'cover_photo', 'social_insurance_number', 'about', 'reporting_to', 'role', 'source_of_hiring', 
-            'date_of_joining', 'employee_type', 'exit_date', 'status'
-        ]
+        model = Employee
+        fields = '__all__'
+    
+    
 
     def validate_role(self, role_name):
         try:
@@ -28,7 +25,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         role_name = validated_data.pop('role', None)
-        user_profile = UserProfile.objects.create(**validated_data)
+        user_profile = Employee.objects.create(**validated_data)
         if role_name:
             user_profile.role = self.validate_role(role_name['name'])
             user_profile.save()
@@ -44,6 +41,16 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
+class BankAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = ['bank_name', 'iban', 'account_name', 'bank_currency'] 
+
+    def validate(self, data):
+        if not all(data.get(field) for field in ['bank_name', 'iban', 'account_name', 'bank_currency']):
+            raise serializers.ValidationError("All fields in bank account information are required.")
+        return data
+
 
 class ExperienceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,7 +62,4 @@ class DependentSerializer(serializers.ModelSerializer):
         model = Dependent
         fields = '__all__'
 
-class SkillSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Skill
-        fields = '__all__'
+

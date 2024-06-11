@@ -11,7 +11,7 @@ class Command(BaseCommand):
 
         # Define your permissions and roles here
         permissions_to_roles = {
-            'Assistant HR': ['Employees-edit', 'Employee-delete'],
+            'Employee': ['Employees-List'],
             # Add more roles and permissions as needed
         }
 

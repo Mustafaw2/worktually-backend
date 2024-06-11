@@ -1,9 +1,9 @@
 from django.db import models
-from employee.modules.users.models import UserProfile
+from employee.modules.users.models import Employee
 from django.conf import settings
 
 class Dependent(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     relation = models.CharField(max_length=100)
     id_number = models.CharField(max_length=50, blank=True, null=True)

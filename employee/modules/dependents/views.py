@@ -2,14 +2,40 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from .models import Dependent
 from .serializers import DependentSerializer
 
 class DependentsListView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={200: openapi.Response('List of dependents', DependentSerializer(many=True))},
+        operation_description="Get list of dependents",
+        examples={
+            'application/json': [
+                {
+                    "id": 1,
+                    "user": 1,
+                    "name": "John Doe",
+                    "relation": "Child",
+                    "id_number": "12345",
+                    "social_insurance_number": "67890"
+                },
+                {
+                    "id": 2,
+                    "user": 1,
+                    "name": "Jane Doe",
+                    "relation": "Spouse",
+                    "id_number": "54321",
+                    "social_insurance_number": "09876"
+                }
+            ]
+        }
+    )
     def get(self, request):
-        dependents = Dependent.objects.filter(user=request.user)
+        dependents = Dependent.objects.filter()
         serializer = DependentSerializer(dependents, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -17,32 +43,76 @@ class DependentsListView(APIView):
 class AddDependentView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=DependentSerializer,
+        responses={
+            201: openapi.Response('Dependent added successfully.', DependentSerializer),
+            400: 'Bad Request'
+        },
+        operation_description="Add a new dependent",
+        examples={
+            'application/json': {
+                "name": "John Doe",
+                "relation": "Child",
+                "id_number": "12345",
+                "social_insurance_number": "67890"
+            }
+        }
+    )
     def post(self, request):
         serializer = DependentSerializer(data=request.data)
         if serializer.is_valid():
-            try:
-                serializer.save(user=request.user)
-                return Response({'message': 'Dependent added successfully.', 'data': serializer.data}, status=status.HTTP_201_CREATED)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save(employee_id=request.data.get('employee_id'))
+            return Response({"message": "Dependent added successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class EditDependentView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=DependentSerializer,
+        responses={
+            200: openapi.Response('Dependent updated successfully.', DependentSerializer),
+            400: 'Bad Request',
+            404: 'Dependent not found.'
+        },
+        operation_description="Update an existing dependent by ID",
+        examples={
+            "application/json": {
+                "name": "Updated John Doe",
+                "relation": "Updated Child",
+                "id_number": "54321",
+                "social_insurance_number": "09876"
+            }
+        }
+    )
     def put(self, request, dependent_id):
         try:
-            dependent = Dependent.objects.get(id=dependent_id, user=request.user)
+            dependent = Dependent.objects.get(id=dependent_id, employee_id=request.user)
         except Dependent.DoesNotExist:
             return Response({"error": "Dependent not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = DependentSerializer(dependent, data=request.data, partial=True)
+        serializer = DependentSerializer(dependent, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Dependent updated successfully.", "data": serializer.data}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        request_body=DependentSerializer,
+        responses={
+            200: openapi.Response('Dependent updated successfully.', DependentSerializer),
+            400: 'Bad Request',
+            404: 'Dependent not found.'
+        },
+        operation_description="Partially update an existing dependent by ID",
+        examples={
+            "application/json": {
+                "name": "Updated John Doe"
+            }
+        }
+    )
     def patch(self, request, dependent_id):
         try:
             dependent = Dependent.objects.get(id=dependent_id, user=request.user)
@@ -59,9 +129,20 @@ class EditDependentView(APIView):
 class DeleteDependentView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response('Dependent deleted successfully.')
+        },
+        operation_description="Delete an existing dependent by ID",
+        examples={
+            "application/json": {
+                "message": "Dependent deleted successfully."
+            }
+        }
+    )
     def delete(self, request, dependent_id):
         try:
-            dependent = Dependent.objects.get(id=dependent_id, user=request.user)
+            dependent = Dependent.objects.get(id=dependent_id, employee_id=request.user)
         except Dependent.DoesNotExist:
             return Response({"error": "Dependent not found."}, status=status.HTTP_404_NOT_FOUND)
 

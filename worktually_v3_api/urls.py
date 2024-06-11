@@ -19,6 +19,7 @@ from django.urls import path, re_path,include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from authentication.views import  RegisterView, LoginView, LogoutView, ForgetPasswordView, VerifyOTPView, ResetPasswordView
 
 schema_view = get_schema_view(
@@ -36,9 +37,9 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/register/', RegisterView.as_view(), name='register'),
-    path('api/login/', LoginView.as_view(), name='login'),
-    path('api/logout/', LogoutView.as_view(), name='logout'),
+    # path('api/register/', RegisterView.as_view(), name='register'),
+    # path('api/login/', LoginView.as_view(), name='login'),
+    # path('api/logout/', LogoutView.as_view(), name='logout'),
     path('api/forget-password/', ForgetPasswordView.as_view(), name='forget-password'),
     path('api/verify-otp/', VerifyOTPView.as_view(), name='verify-otp'),
     path('api/reset-password/', ResetPasswordView.as_view(), name='reset-password'),

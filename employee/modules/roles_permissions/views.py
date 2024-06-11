@@ -2,49 +2,55 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from .models import PermissionGroup, Permission, Role, Role_has_Permission
-from .serializers import PermissionGroupSerializer, PermissionSerializer, RoleSerializer, Role_has_Permission, SyncPermissionsSerializer
+from .models import PermissionGroup, Permission
+from .serializers import PermissionGroupSerializer, PermissionSerializer
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from django.shortcuts import get_object_or_404
+from .models import PermissionGroup, Permission, Role, Role_has_Permission
+from .serializers import PermissionGroupSerializer, PermissionSerializer, RoleSerializer, SyncPermissionsSerializer
+
 
 class PermissionGroupsListView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Get a list of all permission groups",
+        responses={200: PermissionGroupSerializer(many=True)}
+    )
     def get(self, request):
         groups = PermissionGroup.objects.all()
         serializer = PermissionGroupSerializer(groups, many=True)
         return Response(serializer.data)
-    
-    
-class AddPermissionView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        serializer = PermissionSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                'message': 'Permission added successfully',
-                'data': serializer.data
-            }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 class ViewPermissionGroup(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Get details of a specific permission group",
+        responses={200: PermissionGroupSerializer()}
+    )
     def get(self, request, group_id):
-        try:
-            permission_group = PermissionGroup.objects.get(id=group_id)
-        except PermissionGroup.DoesNotExist:
-            return Response({"error": "Permission group not found"}, status=status.HTTP_404_NOT_FOUND)
-        
+        permission_group = get_object_or_404(PermissionGroup, id=group_id)
         serializer = PermissionGroupSerializer(permission_group)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class AddPermissionGroupView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Add a new permission group",
+        request_body=PermissionGroupSerializer,
+        responses={
+            201: openapi.Response("Permission group added successfully", PermissionGroupSerializer),
+            400: "Bad Request"
+        },
+        examples={
+            "application/json": {
+                "name": "Group Name",
+            }
+        }
+    )
     def post(self, request):
         serializer = PermissionGroupSerializer(data=request.data)
         if serializer.is_valid():
@@ -52,27 +58,73 @@ class AddPermissionGroupView(APIView):
             return Response({"message": "Permission group added successfully.", "data": serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class AddPermissionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="Add a new permission",
+        request_body=PermissionSerializer,
+        responses={
+            201: openapi.Response("Permission added successfully", PermissionSerializer),
+            400: "Bad Request"
+        },
+        examples={
+            "application/json": {
+                "permission_group": "permission_group_id",
+                "name": "permission name"
+            }
+        }
+    )
+    def post(self, request):
+        serializer = PermissionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Permission added successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class EditPermissionGroupView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Update a permission group",
+        request_body=PermissionGroupSerializer,
+        responses={
+            200: openapi.Response("Permission group updated successfully", PermissionGroupSerializer),
+            400: "Bad Request",
+            404: "Not Found"
+        },
+        examples={
+            "application/json": {
+                "name": "Updated Group Name",
+            }
+        }
+    )
     def put(self, request, group_id):
-        try:
-            group = PermissionGroup.objects.get(id=group_id)
-        except PermissionGroup.DoesNotExist:
-            return Response({"message": "Permission group not found"}, status=status.HTTP_404_NOT_FOUND)
-
+        group = get_object_or_404(PermissionGroup, id=group_id)
         serializer = PermissionGroupSerializer(group, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Permission group updated successfully.", "data": serializer.data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        operation_description="Partial update of a permission group",
+        request_body=PermissionGroupSerializer,
+        responses={
+            200: openapi.Response("Permission group updated successfully", PermissionGroupSerializer),
+            400: "Bad Request",
+            404: "Not Found"
+        },
+        examples={
+            "application/json": {
+                "name": "Updated Group Name",
+                
+            }
+        }
+    )
     def patch(self, request, group_id):
-        try:
-            group = PermissionGroup.objects.get(id=group_id)
-        except PermissionGroup.DoesNotExist:
-            return Response({"message": "Permission group not found"}, status=status.HTTP_404_NOT_FOUND)
-
+        group = get_object_or_404(PermissionGroup, id=group_id)
         serializer = PermissionGroupSerializer(group, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -82,12 +134,30 @@ class EditPermissionGroupView(APIView):
 class EditPermissionsInGroup(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Bulk update of permissions in a group",
+        request_body=PermissionSerializer(many=True),
+        responses={
+            200: openapi.Response("Permissions updated successfully", PermissionSerializer(many=True)),
+            400: "Bad Request",
+            404: "Not Found",
+            500: "Internal Server Error"
+        },
+        examples={
+            "application/json": [
+                {
+                    "id": 1,
+                    "name": "Updated Permission Name"
+                },
+                {
+                    "id": 2,
+                    "name": "Updated Permission Name"
+                }
+            ]
+        }
+    )
     def put(self, request, group_id):
-        try:
-            permission_group = PermissionGroup.objects.get(id=group_id)
-        except PermissionGroup.DoesNotExist:
-            return Response({"error": "Permission group not found"}, status=status.HTTP_404_NOT_FOUND)
-
+        permission_group = get_object_or_404(PermissionGroup, id=group_id)
         permissions_data = request.data.get('permissions', [])
         permission_ids = [perm.get('id') for perm in permissions_data if perm.get('id')]
         existing_permissions = permission_group.permissions.all()
@@ -107,18 +177,52 @@ class EditPermissionsInGroup(APIView):
 class PermissionGroupDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Get details of a specific permission group",
+        responses={
+            200: PermissionGroupSerializer(),
+            404: "Not Found"
+        }
+    )
     def get(self, request, group_id):
-        try:
-            group = PermissionGroup.objects.get(id=group_id)
-        except PermissionGroup.DoesNotExist:
-            return Response({"message": "Permission group not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = PermissionGroupSerializer(group)
+        permission_group = get_object_or_404(PermissionGroup, id=group_id)
+        serializer = PermissionGroupSerializer(permission_group)
         return Response(serializer.data)
+
+
+
 
 class AddPermissionsToGroupView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Add permissions to a permission group",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'permissions': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Items(type=openapi.TYPE_OBJECT, properties={
+                        'name': openapi.Schema(type=openapi.TYPE_STRING)
+                    })
+                )
+            },
+            required=['permissions']
+        ),
+        responses={
+            201: "Permissions added to group successfully.",
+            400: "Bad Request",
+            404: "Permission group not found"
+        },
+        examples={
+            "application/json": {
+                "permissions": [
+                    {"name": "permission1"},
+                    {"name": "permission2"}
+                ]
+            }
+        }
+    )
     def post(self, request, group_id):
         try:
             group = PermissionGroup.objects.get(id=group_id)
@@ -126,6 +230,7 @@ class AddPermissionsToGroupView(APIView):
             return Response({"message": "Permission group not found"}, status=status.HTTP_404_NOT_FOUND)
 
         permissions = request.data.get('permissions', [])
+        print(permissions)
         if not permissions:
             return Response({"message": "No permissions provided"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -143,9 +248,33 @@ class AddPermissionsToGroupView(APIView):
         
         return Response({"message": "Permissions added to group successfully."}, status=status.HTTP_201_CREATED)
 
+
 class DeletePermissionsFromGroupView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Delete permissions from a permission group",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'permissions': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Items(type=openapi.TYPE_INTEGER)
+                )
+            },
+            required=['permissions']
+        ),
+        responses={
+            204: "Permissions deleted from group successfully.",
+            400: "Bad Request",
+            404: "Permission group not found"
+        },
+        examples={
+            "application/json": {
+                "permissions": [1, 2, 3]
+            }
+        }
+    )
     def delete(self, request, group_id):
         try:
             group = PermissionGroup.objects.get(id=group_id)
@@ -156,9 +285,17 @@ class DeletePermissionsFromGroupView(APIView):
         Permission.objects.filter(id__in=permissions, permission_group=group).delete()
         return Response({"message": "Permissions deleted from group successfully."}, status=status.HTTP_204_NO_CONTENT)
 
+
 class DeletePermissionGroupView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Delete a permission group",
+        responses={
+            204: "Permission group deleted successfully.",
+            404: "Permission group not found"
+        }
+    )
     def delete(self, request, group_id):
         try:
             group = PermissionGroup.objects.get(id=group_id)
@@ -168,17 +305,38 @@ class DeletePermissionGroupView(APIView):
         group.delete()
         return Response({"message": "Permission group deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
+
+
+
 class RolesListView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Retrieve a list of all roles",
+        responses={200: RoleSerializer(many=True)}
+    )
     def get(self, request):
         roles = Role.objects.all()
         serializer = RoleSerializer(roles, many=True)
         return Response(serializer.data)
 
+
 class AddRoleView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Add a new role",
+        request_body=RoleSerializer,
+        responses={
+            201: openapi.Response("Role added successfully.", RoleSerializer),
+            400: "Bad Request"
+        },
+        examples={
+            "application/json": {
+                "name": "Admin"
+            }
+        }
+    )
     def post(self, request):
         serializer = RoleSerializer(data=request.data)
         if serializer.is_valid():
@@ -186,9 +344,19 @@ class AddRoleView(APIView):
             return Response({"message": "Role added successfully.", "data": serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class EditRoleView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Edit a role by ID",
+        request_body=RoleSerializer,
+        responses={
+            200: openapi.Response("Role updated successfully.", RoleSerializer),
+            400: "Bad Request",
+            404: "Role not found"
+        }
+    )
     def put(self, request, role_id):
         try:
             role = Role.objects.get(id=role_id)
@@ -201,6 +369,15 @@ class EditRoleView(APIView):
             return Response({"message": "Role updated successfully.", "data": serializer.data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        operation_description="Partially update a role by ID",
+        request_body=RoleSerializer,
+        responses={
+            200: openapi.Response("Role updated successfully.", RoleSerializer),
+            400: "Bad Request",
+            404: "Role not found"
+        }
+    )
     def patch(self, request, role_id):
         try:
             role = Role.objects.get(id=role_id)
@@ -213,9 +390,17 @@ class EditRoleView(APIView):
             return Response({"message": "Role updated successfully.", "data": serializer.data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class DeleteRoleView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Delete a role by ID",
+        responses={
+            204: "Role deleted successfully.",
+            404: "Role not found"
+        }
+    )
     def delete(self, request, role_id):
         try:
             role = Role.objects.get(id=role_id)
@@ -225,9 +410,17 @@ class DeleteRoleView(APIView):
         role.delete()
         return Response({"message": "Role deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
+
 class RoleDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Retrieve details of a role by ID",
+        responses={
+            200: RoleSerializer,
+            404: "Role not found"
+        }
+    )
     def get(self, request, role_id):
         try:
             role = Role.objects.get(id=role_id)
@@ -237,9 +430,24 @@ class RoleDetailView(APIView):
         serializer = RoleSerializer(role)
         return Response(serializer.data)
 
+
 class SyncPermissionsToRoleView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Sync permissions to a role by ID",
+        request_body=SyncPermissionsSerializer,
+        responses={
+            200: "Permissions synced successfully.",
+            400: "Bad Request",
+            404: "Role not found"
+        },
+        examples={
+            "application/json": {
+                "permissions": [1, 2, 3]
+            }
+        }
+    )
     def post(self, request, role_id):
         role = get_object_or_404(Role, id=role_id)
         serializer = SyncPermissionsSerializer(data=request.data)
@@ -261,11 +469,34 @@ class SyncPermissionsToRoleView(APIView):
             return Response({"message": "Permissions synced successfully."}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
 
 class AddPermissionsToRoleView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Add permissions to a role by ID",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'permissions': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Items(type=openapi.TYPE_STRING)
+                )
+            },
+            required=['permissions']
+        ),
+        responses={
+            201: "Permissions added to role successfully.",
+            400: "Bad Request",
+            404: "Role not found"
+        },
+        examples={
+            "application/json": {
+                "permissions": ["permission1", "permission2"]
+            }
+        }
+    )
     def post(self, request, role_id):
         try:
             role = Role.objects.get(id=role_id)
