@@ -3,13 +3,26 @@ from datetime import timedelta
 import os
 
 from dotenv import load_dotenv
+import environ
+import os
+from pathlib import Path
+from sshtunnel import SSHTunnelForwarder
+import dj_database_url
+
 
 # Load environment variables from .env file
 load_dotenv()
+env = environ.Env()
+environ.Env.read_env()
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-()*-xinj3q0=s=j)mqx*nntf%r07)n0^3e2ovy1onzk#-wurzz')
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
@@ -61,24 +74,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'worktually_v3_api.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'worktually_local'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', '1214'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
-    },
-    'global': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('GLOBAL_DB_NAME', 'worktually_global'),
-        'USER': os.getenv('GLOBAL_DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('GLOBAL_DB_PASSWORD', '1214'),
-        'HOST': os.getenv('GLOBAL_DB_HOST', 'localhost'),
-        'PORT': os.getenv('GLOBAL_DB_PORT', '5432'),
+with SSHTunnelForwarder(
+    ('159.223.180.78', 22),
+    ssh_username='forge',
+    ssh_password='your_ssh_password',
+    remote_bind_address=('127.0.0.1', 5432)
+) as tunnel:
+    # Configure the database connection using the local bind port
+    DATABASE_URL = os.getenv('DATABASE_URL')
+    DATABASES = {
+        'default': dj_database_url.config(default=DATABASE_URL)
     }
-}
 # DATABASE_ROUTERS = ['dbrouters.router.GlobalDatabaseRouter']
 
 # Password validation
