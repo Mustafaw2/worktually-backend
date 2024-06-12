@@ -77,8 +77,8 @@ WSGI_APPLICATION = 'worktually_v3_api.wsgi.application'
 with SSHTunnelForwarder(
     ('159.223.180.78', 22),
     ssh_username='forge',
-    ssh_password='your_ssh_password',
-    remote_bind_address=('127.0.0.1', 5432)
+    ssh_password='fkAevRXFxoFITxT56kl1',
+    remote_bind_address=('127.0.0.1', 5433)
 ) as tunnel:
     # Configure the database connection using the local bind port
     DATABASE_URL = os.getenv('DATABASE_URL')
