@@ -6,9 +6,7 @@ from dotenv import load_dotenv
 import environ
 import os
 from pathlib import Path
-from sshtunnel import SSHTunnelForwarder
 import dj_database_url
-
 
 # Load environment variables from .env file
 load_dotenv()
@@ -18,8 +16,7 @@ environ.Env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
@@ -74,17 +71,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'worktually_v3_api.wsgi.application'
 
-with SSHTunnelForwarder(
-    ('159.223.180.78', 22),
-    ssh_username='forge',
-    ssh_password='fkAevRXFxoFITxT56kl1',
-    remote_bind_address=('127.0.0.1', 5433)
-) as tunnel:
-    # Configure the database connection using the local bind port
-    DATABASE_URL = os.getenv('DATABASE_URL')
-    DATABASES = {
-        'default': dj_database_url.config(default=DATABASE_URL)
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+        'HOST': env('DATABASE_HOST'),
+        'PORT': env('DATABASE_PORT'),
     }
+}
+
+
+
 # DATABASE_ROUTERS = ['dbrouters.router.GlobalDatabaseRouter']
 
 # Password validation
