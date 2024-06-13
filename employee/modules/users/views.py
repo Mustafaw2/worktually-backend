@@ -3,7 +3,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
-from authentication.models import User
 from drf_yasg.utils import swagger_auto_schema
 from .models import Employee, BankAccount, EmergencyContact
 from middlewares.role_permission_middleware import PermissionMiddleware

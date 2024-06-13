@@ -1,8 +1,9 @@
 from django.db import models
 from django.conf import settings
+from employee.models import Employee
 
 class Language(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='languages')
+    user = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='languages')
     language = models.CharField(max_length=100)
     level = models.CharField(max_length=50, choices=[('Basic', 'Basic'), ('Conversational', 'Conversational'), ('Fluent', 'Fluent'), ('Native', 'Native')])
 
