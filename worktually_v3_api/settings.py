@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'authentication',
     'employee',
+    'lookups',
     'django_extensions',
 ]
 
@@ -74,15 +75,25 @@ DATABASES = {
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
         'HOST': os.getenv('DATABASE_HOST'),
         'PORT': os.getenv('DATABASE_PORT'),
-    }
+    },
+    'global': {
+        'ENGINE': 'django.db.backends.postgresql', 
+        'NAME': os.getenv('GLOBAL_DATABASE_NAME'),
+        'USER': os.getenv('GLOBAL_DATABASE_USER'),
+        'PASSWORD': os.getenv('GLOBAL_DATABASE_PASSWORD'),
+        'HOST': os.getenv('GLOBAL_DATABASE_HOST'),
+        'PORT': os.getenv('GLOBAL_DATABASE_PORT'),
+    },
 }
 
 
 
-# DATABASE_ROUTERS = ['dbrouters.router.GlobalDatabaseRouter']
+DATABASE_ROUTERS = ['dbrouters.router.GlobalDatabaseRouter']
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
+
+
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -129,6 +140,8 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
+
+
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(os.getenv('ACCESS_TOKEN_LIFETIME_MINUTES', 500))),

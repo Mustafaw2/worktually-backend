@@ -89,7 +89,7 @@ class EditDependentView(APIView):
     )
     def put(self, request, dependent_id):
         try:
-            dependent = Dependent.objects.get(id=dependent_id, employee_id=request.user)
+            dependent = Dependent.objects.get(id=dependent_id)
         except Dependent.DoesNotExist:
             return Response({"error": "Dependent not found."}, status=status.HTTP_404_NOT_FOUND)
 
