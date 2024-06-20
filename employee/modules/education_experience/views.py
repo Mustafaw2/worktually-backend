@@ -18,7 +18,7 @@ class EducationsListView(APIView):
         responses={200: EducationSerializer(many=True)}
     )
     def get(self, request, *args, **kwargs):
-        educations = Education.objects.filter()
+        educations = Education.objects.all()
         serializer = EducationSerializer(educations, many=True)
         return Response(serializer.data)
 
@@ -140,7 +140,7 @@ class ExperiencesListView(APIView):
         responses={200: ExperienceSerializer(many=True)}
     )
     def get(self, request, *args, **kwargs):
-        experiences = Experience.objects.filter(user=request.user)
+        experiences = Experience.objects.all()
         serializer = ExperienceSerializer(experiences, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
