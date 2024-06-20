@@ -8,9 +8,18 @@ class Industry(models.Model):
         db_table = 'lookup_industry'
         app_label = 'lookups'
 
+from django.db import models
+
 class Country(models.Model):
-    name = models.CharField(max_length=100)
-    status = models.CharField(max_length=50)
+    name = models.CharField(max_length=100, default='')
+    iso3 = models.CharField(max_length=3, default='')
+    iso2 = models.CharField(max_length=2, default='')
+    phone_code = models.CharField(max_length=20, default='')
+    capital = models.CharField(max_length=255, default='')
+    currency = models.CharField(max_length=255, default='')
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         db_table = 'lookup_country'

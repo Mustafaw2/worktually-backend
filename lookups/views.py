@@ -14,7 +14,9 @@ class LookupBaseViewSet(viewsets.ModelViewSet):
     serializer_class = None  # To be overridden in subclasses
 
     def get_queryset(self):
-        return self.queryset.objects.all()
+        if self.queryset is None:
+            raise AssertionError("queryset is not set")
+        return self.queryset
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
