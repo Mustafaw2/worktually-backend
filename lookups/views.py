@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Industry, Country, State, City, Designation, Department, Source, DegreeType, EmployeeType, JobType, Relation, Skill, Language
 from .serializers import IndustrySerializer, CountrySerializer, StateSerializer, CitySerializer, DesignationSerializer, DepartmentSerializer, SourceSerializer, DegreeTypeSerializer, EmployeeTypeSerializer, JobTypeSerializer, RelationSerializer, SkillSerializer, LanguageSerializer
+from rest_framework.permissions import IsAuthenticated
 
 
 class LookupBaseViewSet(viewsets.ModelViewSet):
@@ -12,6 +13,7 @@ class LookupBaseViewSet(viewsets.ModelViewSet):
     """
     queryset = None  # To be overridden in subclasses
     serializer_class = None  # To be overridden in subclasses
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         if self.queryset is None:

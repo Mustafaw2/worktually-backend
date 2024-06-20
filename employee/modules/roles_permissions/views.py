@@ -158,19 +158,43 @@ class EditPermissionsInGroup(APIView):
     )
     def put(self, request, group_id):
         permission_group = get_object_or_404(PermissionGroup, id=group_id)
-        permissions_data = request.data.get('permissions', [])
-        permission_ids = [perm.get('id') for perm in permissions_data if perm.get('id')]
-        existing_permissions = permission_group.permissions.all()
+        permissions_data = request.data  # Access data directly
+
         try:
-            instance = Permission.objects.filter(permission_group=permission_group, id__in=permission_ids)
-            serializer = PermissionSerializer(instance=existing_permissions, data=permissions_data, many=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response({
-                    "message": "Permissions updated successfully.",
-                    "data": serializer.data
-                }, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # Normalize data to always be a list
+            if isinstance(permissions_data, dict):
+                permissions_data = [permissions_data]
+            elif not isinstance(permissions_data, list):
+                return Response({"error": "Invalid data format. Expected a list of permissions or a single permission."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Validate each item in the list to ensure it's a dictionary with an 'id' key
+            permission_ids = []
+            for perm in permissions_data:
+                if isinstance(perm, dict) and 'id' in perm:
+                    permission_ids.append(perm['id'])
+                else:
+                    return Response({"error": f"Invalid permission data: {perm}. Each permission must be a dictionary with an 'id' key."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Update permission details and collect updated permissions
+            updated_permissions = []
+            for perm in permissions_data:
+                permission_instance = get_object_or_404(Permission, id=perm['id'])
+                serializer = PermissionSerializer(permission_instance, data=perm, partial=True)
+                if serializer.is_valid(raise_exception=True):
+                    serializer.save()
+                    updated_permissions.append(permission_instance)
+
+            # Set the updated permissions in the permission group
+            permission_group.permissions.set(updated_permissions)
+
+            # Serialize the updated permissions
+            serializer = PermissionSerializer(updated_permissions, many=True)
+
+            return Response({
+                "message": "Permissions updated successfully.",
+                "data": serializer.data
+            }, status=status.HTTP_200_OK)
+
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
