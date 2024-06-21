@@ -1,8 +1,8 @@
 from django.db import models
-from job_seekers.models import JobSeeker
+from django.apps import apps
 
 class JobProfileExperience(models.Model):
-    job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, related_name='experiences')
+    job_seeker = models.ForeignKey('job_seekers.JobSeeker', on_delete=models.CASCADE, related_name='experiences')
     title = models.CharField(max_length=45)
     job_type_id = models.CharField(max_length=45)
     company_name = models.CharField(max_length=45)
