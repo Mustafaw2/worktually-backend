@@ -1,0 +1,15 @@
+from django.db import models
+from job_seekers.models import JobSeeker
+
+class JobProfileExperience(models.Model):
+    job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, related_name='experiences')
+    title = models.CharField(max_length=45)
+    job_type_id = models.CharField(max_length=45)
+    company_name = models.CharField(max_length=45)
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)
+    description = models.CharField(max_length=45)
+    experience_letter_photo = models.CharField(max_length=45)
+
+    def __str__(self):
+        return self.title

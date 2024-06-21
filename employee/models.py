@@ -1,5 +1,5 @@
 from django.db import models
-from .modules.users.models import Employee
+from .modules.users.models import Employee, OTP
 from .modules.settings.models import Setting
 from .modules.organisations.models import  Organization
 from .modules.dependents.models import Dependent

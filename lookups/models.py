@@ -26,8 +26,10 @@ class Country(models.Model):
         app_label = 'lookups'
 
 class State(models.Model):
-    name = models.CharField(max_length=100)
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=255)
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    state_code = models.CharField(max_length=10, default='', blank=True)
 
     class Meta:
         db_table = 'lookup_state'

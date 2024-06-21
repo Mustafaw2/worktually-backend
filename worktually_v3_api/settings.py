@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'authentication',
     'employee',
     'lookups',
+    'job_seekers',
     'django_extensions',
 ]
 

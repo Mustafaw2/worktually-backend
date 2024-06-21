@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from employee.models import Employee
+from employee.models import Employee, OTP
 from django.contrib.auth import authenticate
 
 
@@ -51,3 +51,50 @@ class EmployeesSerializer(serializers.ModelSerializer):
     
 class LogoutSerializer(serializers.Serializer):
     pass
+
+
+class ForgetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        if not Employee.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is not registered.")
+        return value
+
+class VerifyOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=6)
+
+    def validate(self, data):
+        email = data.get('email')
+        otp = data.get('otp')
+        if not OTP.objects.filter(email=email, otp=otp, is_verified=False).exists():
+            raise serializers.ValidationError("Invalid OTP.")
+        return data
+
+class ResetPasswordRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    token = serializers.UUIDField()
+    new_password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        email = data.get('email')
+        token = data.get('token')
+        if data['new_password'] != data['confirm_password']:
+            raise serializers.ValidationError("Passwords do not match.")
+        if not OTP.objects.filter(email=email, reset_token=token).exists():
+            raise serializers.ValidationError("Invalid or expired token.")
+        return data
+
+    def save(self):
+        validated_data = self.validated_data
+        otp_instance = OTP.objects.get(email=validated_data['email'], reset_token=validated_data['token'])
+        employee = Employee.objects.get(email=validated_data['email'])
+        employee.set_password(validated_data['new_password'])
+        employee.save()
+        # Invalidate the OTP and token after successful password reset
+        otp_instance.delete()
+        return validated_data
+
+

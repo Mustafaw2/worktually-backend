@@ -8,7 +8,7 @@ from .modules.accounts.views import *
 from .modules.roles_permissions.views import (
     PermissionGroupsListView, AddPermissionGroupView, EditPermissionGroupView, PermissionGroupDetailView, 
     AddPermissionsToGroupView, DeletePermissionsFromGroupView, DeletePermissionGroupView, 
-    RolesListView, AddRoleView, EditRoleView, DeleteRoleView, RoleDetailView, SyncPermissionsToRoleView,ViewPermissionGroup, EditPermissionsInGroup, AddPermissionsToRoleView, AddPermissionView, 
+    RolesListView, AddRoleView, EditRoleView, DeleteRoleView, RoleDetailView, SyncPermissionsToRoleView,ViewPermissionGroup, EditPermissionsInGroup, AddPermissionsToRoleView, AddPermissionView,
 )
 from rest_framework.routers import DefaultRouter
 from .modules.lookups.models import *
@@ -23,6 +23,8 @@ urlpatterns = [
     path('employees/edit-basic-information/<int:id>/', EditBasicInformationView.as_view(), name='edit-basic-info', kwargs={'required_permission': 'Employees-edit'}),
     path('employees/<int:pk>/edit/work/',  EditWorkInformationView.as_view(), name='edit-work-info', kwargs={'required_permission': 'Employees-edit'}),
     path('employees/<int:pk>/edit/personal_info/', EditPersonalInformationView.as_view(), name='edit-personal-info', kwargs={'required_permission': 'Employees-edit'}),
+    path('employees/bank-accounts/add/', AddBankAccountView.as_view(), name='add-bank-account'),
+    path('employees/emergency-contacts/add/', AddEmergencyContactView.as_view(), name='add-emergency-contact'),
     path('employees/<int:pk>/edit/bank_info/', EditBankAccountView.as_view(), name='edit-bank-account', kwargs={'required_permission': 'Employees-edit'}),
     path('employees/<int:pk>/edit/emergency_info/', EditEmergencyInformationView.as_view(), name='edit-emergency-info', kwargs={'required_permission': 'Employees-edit'}),
     path('employees/<int:pk>/edit/profile-picture/', ChangeProfilePictureView.as_view(), name='change-profile-picture', kwargs={'required_permission': 'Employees-edit'}),
@@ -62,4 +64,8 @@ urlpatterns = [
     path('register', RegisterView.as_view(), name='register'),
     path('login', LoginView.as_view(), name='login'),
     path('logout', LogoutView.as_view(), name='logout'),
+    path('forget-password/', ForgetPasswordView.as_view(), name='forget-password'),
+    path('verify-otp/', VerifyOTPView.as_view(), name='verify-otp'),
+    path('reset-password/', ResetPasswordView.as_view(), name='reset-password'),
+
 ]

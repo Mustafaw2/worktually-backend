@@ -3,6 +3,9 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+import uuid
+import random
+import string
 
 class EmployeeManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password=None):
@@ -77,6 +80,22 @@ class Employee(AbstractBaseUser):
     @property
     def is_authenticated(self):
         return True
+    
+
+class OTP(models.Model):
+    email = models.EmailField()
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_verified = models.BooleanField(default=False)
+    reset_token = models.UUIDField(default=uuid.uuid4, unique=True)
+
+    @staticmethod
+    def generate_otp():
+        return ''.join(random.choices(string.digits, k=6))
+
+    def __str__(self):
+        return f'{self.email} - {self.otp}'
+
     
 
 

@@ -201,6 +201,39 @@ class EditPersonalInformationView(APIView):
             serializer.save()
             return Response({"detail": "Personal information updated successfully."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class AddBankAccountView(APIView):
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        operation_description="Add a new bank account for the authenticated employee.",
+        request_body=BankAccountSerializer,
+        responses={
+            201: openapi.Response('Bank account added successfully', BankAccountSerializer),
+            400: 'Bad request'
+        },
+        request_body_examples={
+            'application/json': {
+                "employee_id": 1,
+                "name": "John Doe",
+                "email": "john.doe@example.com",
+                "phone": "123-456-7890",
+                "relation": "Friend",
+                "address": "123 Main St, Springfield",
+                "country_id": 1,
+                "state_id": 1,
+                "city_id": 1,
+                "postal_code": "12345"
+            }
+        }
+    )
+    def post(self, request):
+        serializer = BankAccountSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(employee=request.user)
+            return Response({"message": "Bank account added successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 class EditBankAccountView(APIView):
     permission_classes = [IsAuthenticated]
@@ -234,6 +267,37 @@ class EditBankAccountView(APIView):
             return Response({'message': 'Bank account information updated successfully.'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
+
+class AddEmergencyContactView(APIView):
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        operation_description="Add a new emergency contact for the authenticated employee.",
+        request_body=EmergencyContactSerializer,
+        responses={
+            201: openapi.Response('Emergency contact added successfully', EmergencyContactSerializer),
+            400: 'Bad request'
+        },
+        request_body_examples={
+            'application/json': {
+                "name": "John Doe",
+                "email": "john.doe@example.com",
+                "phone": "123-456-7890",
+                "relation": "Friend",
+                "address": "123 Main St, Springfield",
+                "country_id": 1,
+                "state_id": 1,
+                "city_id": 1,
+                "postal_code": "12345"
+            }
+        }
+    )
+    def post(self, request):
+        serializer = EmergencyContactSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(employee=request.user)
+            return Response({"message": "Emergency contact added successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EditEmergencyInformationView(APIView):
     permission_classes = [IsAuthenticated]

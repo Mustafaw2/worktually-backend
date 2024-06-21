@@ -62,27 +62,28 @@ class EmployeePersonalSerializer(serializers.ModelSerializer):
 
 
 class BankAccountSerializer(serializers.ModelSerializer):
+    employee_id = serializers.IntegerField()
+
     class Meta:
         model = BankAccount
-        fields = ['id', 'employee', 'bank_name', 'iban', 'account_number', 'currency']
-        extra_kwargs = {
-            'employee': {'read_only': True}
-        }
+        fields = ['id', 'employee_id', 'bank_name', 'iban', 'account_number', 'currency']
 
-    def validate(self, attrs):
-        required_fields = ['bank_name', 'iban', 'account_number', 'currency']
-        missing_fields = [field for field in required_fields if field not in attrs]
-        if missing_fields:
-            raise serializers.ValidationError(f"The following fields are required: {', '.join(missing_fields)}")
-        return attrs
+    def validate_employee_id(self, value):
+        if not Employee.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Employee does not exist")
+        return value
 
 class EmergencyContactSerializer(serializers.ModelSerializer):
+    employee_id = serializers.IntegerField()
+
     class Meta:
         model = EmergencyContact
-        fields = ['id', 'employee', 'name', 'email', 'phone', 'relation', 'address', 'country_id', 'state_id', 'city_id', 'postal_code']
-        extra_kwargs = {
-            'employee': {'read_only': True}
-        }
+        fields = ['id', 'employee_id', 'name', 'email', 'phone', 'relation', 'address', 'country_id', 'state_id', 'city_id', 'postal_code']
+
+    def validate_employee_id(self, value):
+        if not Employee.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Employee does not exist")
+        return value
 
 
 class ChangeProfilePictureSerializer(serializers.ModelSerializer):
