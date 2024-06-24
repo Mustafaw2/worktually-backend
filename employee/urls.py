@@ -27,6 +27,8 @@ urlpatterns = [
     path('employees/emergency-contacts/add/', AddEmergencyContactView.as_view(), name='add-emergency-contact'),
     path('employees/<int:pk>/edit/bank_info/', EditBankAccountView.as_view(), name='edit-bank-account', kwargs={'required_permission': 'Employees-edit'}),
     path('employees/<int:pk>/edit/emergency_info/', EditEmergencyInformationView.as_view(), name='edit-emergency-info', kwargs={'required_permission': 'Employees-edit'}),
+    path('employees/bank-accounts/<int:pk>/delete/', DeleteBankAccountView.as_view(), name='delete-bank-account'),
+    path('employees/emergency-contacts/<int:pk>/delete/', DeleteEmergencyContactView.as_view(), name='delete-emergency-contact'),
     path('employees/<int:pk>/edit/profile-picture/', ChangeProfilePictureView.as_view(), name='change-profile-picture', kwargs={'required_permission': 'Employees-edit'}),
     path('employees/<int:pk>/edit/cover-picture/', ChangeCoverPictureView.as_view(), name='change-cover-picture', kwargs={'required_permission': 'Employees-edit'}),
     path('employees/experiences/list/', ExperiencesListView.as_view(), name='experiences-list', kwargs={'required_permission': 'Employees-edit'}),

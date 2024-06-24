@@ -37,7 +37,12 @@ class State(models.Model):
 
 class City(models.Model):
     name = models.CharField(max_length=100)
-    state = models.ForeignKey(State, on_delete=models.CASCADE)
+    state = models.ForeignKey('State', on_delete=models.CASCADE)
+    country_id = models.IntegerField(null=True, blank=True)
+    country_code = models.CharField(max_length=10, default='', blank=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+
 
     class Meta:
         db_table = 'lookup_city'

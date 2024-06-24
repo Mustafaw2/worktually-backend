@@ -71,7 +71,7 @@ class LoginView(APIView):
                 # Generate tokens for the logged-in user
                 refresh = RefreshToken.for_user(user)
                 return Response({
-                    'message': 'Login successful',
+                    'status': 'success',
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
                 })

@@ -9,7 +9,7 @@ from middlewares.role_permission_middleware import PermissionMiddleware
 from django.contrib.auth import get_user_model
 import json
 import logging
-
+from rest_framework.exceptions import NotFound
 logger = logging.getLogger(__name__)
 UserProfile = get_user_model()
 from drf_yasg import openapi
@@ -268,6 +268,27 @@ class EditBankAccountView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+class DeleteBankAccountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="Delete a bank account for the authenticated employee.",
+        responses={
+            200: 'Bank account deleted successfully',
+            404: 'Not found',
+            400: 'Bad request'
+        }
+    )
+    def delete(self, request, pk):
+        try:
+            bank_account = BankAccount.objects.get(pk=pk)
+        except BankAccount.DoesNotExist:
+            raise NotFound(detail="Bank account not found", code=status.HTTP_404_NOT_FOUND)
+
+        bank_account.delete()
+        return Response({"message": "Bank account deleted successfully"}, status=status.HTTP_200_OK)
+    
+
 
 class AddEmergencyContactView(APIView):
     permission_classes = [IsAuthenticated]
@@ -336,6 +357,27 @@ class EditEmergencyInformationView(APIView):
             return Response({'message': 'Emergency contact information updated successfully.'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
+class DeleteEmergencyContactView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="Delete an emergency contact for the authenticated employee.",
+        responses={
+            200: 'Emergency contact deleted successfully',
+            404: 'Not found',
+            400: 'Bad request'
+        }
+    )
+    def delete(self, request, pk):
+        try:
+            emergency_contact = EmergencyContact.objects.get(pk=pk)
+        except EmergencyContact.DoesNotExist:
+            raise NotFound(detail="Emergency contact not found", code=status.HTTP_404_NOT_FOUND)
+
+        emergency_contact.delete()
+        return Response({"message": "Emergency contact deleted successfully"}, status=status.HTTP_200_OK)
+
 
 class ChangeProfilePictureView(APIView):
     permission_classes = [IsAuthenticated]
