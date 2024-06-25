@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from employee.models import Employee, OTP
-from .serializers import RegisterSerializer, LoginSerializer, EmployeesSerializer, LogoutSerializer, VerifyOTPSerializer, ResetPasswordRequestSerializer, ForgetPasswordSerializer
+from .serializers import RegisterSerializer, LoginSerializer, EmployeesSerializer, LogoutSerializer, VerifyOTPSerializer, ResetPasswordRequestSerializer, ForgetPasswordSerializer, RoleSerializer
 from django.contrib.auth import authenticate, login, logout
 from django.core.mail import send_mail
 from django.conf import settings
@@ -63,18 +63,22 @@ class LoginView(APIView):
         if serializer.is_valid():
             email = serializer.validated_data['email']
             password = serializer.validated_data['password']
-            # Authenticate the user with email and password
             user = authenticate(request, email=email, password=password)
             if user is not None:
-                # Log the user in
                 login(request, user)
-                # Generate tokens for the logged-in user
                 refresh = RefreshToken.for_user(user)
+                
+                role_data = None
+                if user.role:
+                    role_serializer = RoleSerializer(user.role)
+                    role_data = role_serializer.data
+
                 return Response({
                     'status': 'success',
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
-                })
+                    'roles': role_data,
+                }, status=status.HTTP_200_OK)
             else:
                 return Response({'message': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

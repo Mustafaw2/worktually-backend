@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from employee.models import Employee, OTP
 from django.contrib.auth import authenticate
+from employee.models import Role
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -96,5 +97,13 @@ class ResetPasswordRequestSerializer(serializers.Serializer):
         # Invalidate the OTP and token after successful password reset
         otp_instance.delete()
         return validated_data
+    
+
+class RoleSerializer(serializers.ModelSerializer):
+    created_by = serializers.StringRelatedField()
+
+    class Meta:
+        model = Role
+        fields = ['id', 'name', 'created_by']
 
 

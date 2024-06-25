@@ -8,7 +8,7 @@ class Command(BaseCommand):
     help = 'Populate City model from JSON file'
 
     def handle(self, *args, **kwargs):
-        file_path = os.path.join('lookups', 'fixtures', 'file-2.json')
+        file_path = os.path.join('lookups', 'fixtures', 'file-3.json')
         
         with open(file_path, 'r', encoding='utf-8') as file:
             cities_data = json.load(file)
