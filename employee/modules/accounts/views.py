@@ -77,7 +77,7 @@ class LoginView(APIView):
                     'status': 'success',
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
-                    'roles': role_data,
+                    'role': role_data,
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({'message': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
