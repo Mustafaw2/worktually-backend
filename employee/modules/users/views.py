@@ -9,6 +9,8 @@ from middlewares.role_permission_middleware import PermissionMiddleware
 from django.contrib.auth import get_user_model
 import json
 import logging
+from django.conf import settings
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import NotFound
 logger = logging.getLogger(__name__)
 UserProfile = get_user_model()
@@ -27,9 +29,17 @@ from .serializers import (
 
 class EmployeesListView(APIView):
     def get(self, request, *args, **kwargs):
+
         employees = Employee.objects.all()
-        serializer = EmployeeSerializer(employees, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
+
+        paginated_employees = paginator.paginate_queryset(employees, request)
+
+        serializer = EmployeeSerializer(paginated_employees, many=True)
+
+        return paginator.get_paginated_response(serializer.data)
 
 class AddEmployeeView(APIView):
     permission_classes = [IsAuthenticated]

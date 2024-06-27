@@ -17,7 +17,7 @@ router = DefaultRouter()
 
 
 urlpatterns = [
-    path('employees/list', EmployeesListView.as_view(), name='employees-list', kwargs={'required_permission': 'Employees-List'}),
+    path('employees/list', EmployeesListView.as_view(), name='employees-list', kwargs={'required_permission': 'Employees-list'}),
     path('employees/add/', AddEmployeeView.as_view(), name='add-employee'),
     path('employees/<int:employee_id>/details', EmployeeDetailView.as_view(), name='employee-detail'),
     path('employees/edit-basic-information/<int:id>/', EditBasicInformationView.as_view(), name='edit-basic-info', kwargs={'required_permission': 'Employees-edit'}),
@@ -35,7 +35,7 @@ urlpatterns = [
     path('employees/experience/add/', AddExperienceView.as_view(), name='add-experience', kwargs={'required_permission': 'Employees-edit'}),
     path('employees/experiences/edit/<int:experience_id>/', EditExperienceView.as_view(), name='edit-experience', kwargs={'required_permission': 'Employees-edit'}),
     path('employees/experiences/<int:experience_id>/delete/', DeleteExperienceView.as_view(), name='delete-experience', kwargs={'required_permission': 'Employees-edit'}),
-    path('employees/educations/list', EducationsListView.as_view(), name='educations-list', kwargs={'required_permission': 'Employees-edit'}),
+    path('employees/educations/list/', EducationsListView.as_view(), name='educations-list', kwargs={'required_permission': 'Employees-edit'}),
     path('employees/educations/add/', AddEducationView.as_view(), name='add-education', kwargs={'required_permission': 'Employees-edit'}),
     path('employees/educations/edit/<int:pk>/', EditEducationView.as_view(), name='edit-education', kwargs={'required_permission': 'Employees-edit'}),
     path('employees/educations/<int:pk>/delete/', DeleteEducationView.as_view(), name='delete-education', kwargs={'required_permission': 'Employees-edit'}),
@@ -56,7 +56,7 @@ urlpatterns = [
     path('employees/permission-groups/<int:group_id>/delete-permissions/', DeletePermissionsFromGroupView.as_view(), name='delete-permissions-from-group'),
     path('employees/permission-groups/<int:group_id>/delete_permissions_group/', DeletePermissionGroupView.as_view(), name='delete-permission-group'),
     path('permissions/add/', AddPermissionView.as_view(), name='add-permission'),
-    path('employees/roles/list', RolesListView.as_view(), name='roles-list'),
+    path('employees/roles/list/', RolesListView.as_view(), name='roles-list'),
     path('employees/roles/add/', AddRoleView.as_view(), name='add-role'),
     path('employees/roles/<int:role_id>/edit_role', EditRoleView.as_view(), name='edit-role'),
     path('employees/roles/<int:role_id>/delete/', DeleteRoleView.as_view(), name='delete-role'),

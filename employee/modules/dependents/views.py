@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,6 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import Dependent
 from .serializers import DependentSerializer
+from rest_framework.pagination import PageNumberPagination
 
 class DependentsListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -35,9 +37,21 @@ class DependentsListView(APIView):
         }
     )
     def get(self, request):
-        dependents = Dependent.objects.filter()
-        serializer = DependentSerializer(dependents, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        dependents = Dependent.objects.order_by('id').all()
+
+        
+        # Initialize pagination class with page size from settings
+        paginator = PageNumberPagination()
+        paginator.page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
+        
+        # Paginate the queryset
+        paginated_dependents = paginator.paginate_queryset(dependents, request)
+        
+        # Serialize paginated data
+        serializer = DependentSerializer(paginated_dependents, many=True)
+        
+        # Return paginated response
+        return paginator.get_paginated_response(serializer.data)
 
 
 class AddDependentView(APIView):

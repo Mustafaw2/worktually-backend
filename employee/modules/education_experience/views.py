@@ -9,7 +9,8 @@ from .models import Education
 from .serializers import EducationSerializer
 from .models import Experience
 from .serializers import ExperienceSerializer
-
+from rest_framework.pagination import PageNumberPagination
+from django.conf import settings
 class EducationsListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -18,9 +19,19 @@ class EducationsListView(APIView):
         responses={200: EducationSerializer(many=True)}
     )
     def get(self, request, *args, **kwargs):
+        # Retrieve all educations
         educations = Education.objects.all()
-        serializer = EducationSerializer(educations, many=True)
-        return Response(serializer.data)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = settings.REST_FRAMEWORK['PAGE_SIZE']  
+        # Paginate the queryset
+        paginated_educations = paginator.paginate_queryset(educations, request)
+
+        # Serialize paginated data
+        serializer = EducationSerializer(paginated_educations, many=True)
+
+        # Return paginated response
+        return paginator.get_paginated_response(serializer.data)
 
 class AddEducationView(APIView):
     permission_classes = [IsAuthenticated]
@@ -140,9 +151,19 @@ class ExperiencesListView(APIView):
         responses={200: ExperienceSerializer(many=True)}
     )
     def get(self, request, *args, **kwargs):
-        experiences = Experience.objects.all()
-        serializer = ExperienceSerializer(experiences, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # Retrieve all educations
+        Experience = Experience.objects.all()
+
+        paginator = PageNumberPagination()
+        paginator.page_size = settings.REST_FRAMEWORK['PAGE_SIZE']  
+        # Paginate the queryset
+        paginated_educations = paginator.paginate_queryset(Experience, request)
+
+        # Serialize paginated data
+        serializer = ExperienceSerializer(paginated_educations, many=True)
+
+        # Return paginated response
+        return paginator.get_paginated_response(serializer.data)
 
 class AddExperienceView(APIView):
     permission_classes = [IsAuthenticated]

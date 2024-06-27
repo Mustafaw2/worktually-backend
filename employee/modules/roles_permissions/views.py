@@ -9,7 +9,8 @@ from drf_yasg import openapi
 from django.shortcuts import get_object_or_404
 from .models import PermissionGroup, Permission, Role, Role_has_Permission
 from .serializers import PermissionGroupSerializer, PermissionSerializer, RoleSerializer, SyncPermissionsSerializer
-
+from django.conf import settings
+from rest_framework.pagination import PageNumberPagination
 
 class PermissionGroupsListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -18,10 +19,21 @@ class PermissionGroupsListView(APIView):
         operation_description="Get a list of all permission groups",
         responses={200: PermissionGroupSerializer(many=True)}
     )
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
+        # Retrieve all permission groups
         groups = PermissionGroup.objects.all()
-        serializer = PermissionGroupSerializer(groups, many=True)
-        return Response(serializer.data)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
+
+        # Paginate the queryset
+        paginated_groups = paginator.paginate_queryset(groups, request)
+
+        # Serialize paginated data
+        serializer = PermissionGroupSerializer(paginated_groups, many=True)
+
+        # Return paginated response
+        return paginator.get_paginated_response(serializer.data)
 
 class ViewPermissionGroup(APIView):
     permission_classes = [IsAuthenticated]
@@ -339,10 +351,21 @@ class RolesListView(APIView):
         operation_description="Retrieve a list of all roles",
         responses={200: RoleSerializer(many=True)}
     )
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
+        # Retrieve all roles
         roles = Role.objects.all()
-        serializer = RoleSerializer(roles, many=True)
-        return Response(serializer.data)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = settings.REST_FRAMEWORK['PAGE_SIZE']
+
+        # Paginate the queryset
+        paginated_roles = paginator.paginate_queryset(roles, request)
+
+        # Serialize paginated data
+        serializer = RoleSerializer(paginated_roles, many=True)
+
+        # Return paginated response
+        return paginator.get_paginated_response(serializer.data)
 
 
 class AddRoleView(APIView):
