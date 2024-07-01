@@ -52,11 +52,11 @@ class RoleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Role
-        fields = ['id', 'name', 'created_by', 'permissions']
+        fields = ['id', 'name', 'permissions']
 
     def create(self, validated_data):
         permissions_data = self.context['request'].data.get('permissions', [])
-        role = Role.objects.create(**validated_data)
+        role = Role.objects.create(name=validated_data['name'], created_by=self.context['request'].user)
         for permission_id in permissions_data:
             permission = Permission.objects.get(id=permission_id)
             Role_has_Permission.objects.create(role=role, permission=permission)
