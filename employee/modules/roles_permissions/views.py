@@ -318,7 +318,19 @@ class DeletePermissionsFromGroupView(APIView):
             return Response({"message": "Permission group not found"}, status=status.HTTP_404_NOT_FOUND)
 
         permissions = request.data.get('permissions', [])
-        Permission.objects.filter(id__in=permissions, permission_group=group).delete()
+        if not isinstance(permissions, list) or not all(isinstance(p, int) for p in permissions):
+            return Response({"message": "Invalid data format"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Ensure that the permissions exist and belong to the given group
+        existing_permissions = Permission.objects.filter(id__in=permissions, permission_group=group)
+        if not existing_permissions.exists():
+            return Response({"message": "No matching permissions found in the group"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Delete the permissions
+        deleted_count, _ = existing_permissions.delete()
+        if deleted_count == 0:
+            return Response({"message": "No permissions were deleted"}, status=status.HTTP_400_BAD_REQUEST)
+
         return Response({"message": "Permissions deleted from group successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 
