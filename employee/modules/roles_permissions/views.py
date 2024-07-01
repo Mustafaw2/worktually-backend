@@ -398,7 +398,7 @@ class AddRoleView(APIView):
         }
     )
     def post(self, request):
-        serializer = RoleSerializer(data=request.data)
+        serializer = RoleSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(created_by=request.user)
             return Response({"message": "Success", "data": serializer.data}, status=status.HTTP_201_CREATED)
