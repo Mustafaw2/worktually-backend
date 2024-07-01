@@ -392,7 +392,8 @@ class AddRoleView(APIView):
         },
         examples={
             "application/json": {
-                "name": "Admin"
+                "name": "Admin",
+                "permissions": [1, 2, 3]
             }
         }
     )
@@ -400,7 +401,7 @@ class AddRoleView(APIView):
         serializer = RoleSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(created_by=request.user)
-            return Response({"message": "Role added successfully.", "data": serializer.data}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Success", "data": serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

@@ -48,15 +48,36 @@ class PermissionGroupSerializer(serializers.ModelSerializer):
 
 
 class RoleSerializer(serializers.ModelSerializer):
-    permissions = serializers.SerializerMethodField()
+    permissions = PermissionSerializer(many=True, read_only=True)
+    permission_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Permission.objects.all(), many=True, write_only=True, required=False)
 
     class Meta:
         model = Role
-        fields = ['id', 'name', 'created_by', 'permissions']
+        fields = ['id', 'name', 'created_by', 'permissions', 'permission_ids']
 
-    def get_permissions(self, obj):
-        permissions = Role_has_Permission.objects.filter(role=obj)
-        return PermissionSerializer([rp.permission for rp in permissions], many=True).data
+    def create(self, validated_data):
+        permissions = validated_data.pop('permission_ids', [])
+        role = Role.objects.create(**validated_data)
+        for permission in permissions:
+            Role_has_Permission.objects.create(role=role, permission=permission)
+        return role
+
+    def update(self, instance, validated_data):
+        permissions = validated_data.pop('permission_ids', None)
+        if permissions is not None:
+            Role_has_Permission.objects.filter(role=instance).delete()
+            for permission in permissions:
+                Role_has_Permission.objects.create(role=instance, permission=permission)
+        return super().update(instance, validated_data)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        permissions = Permission.objects.filter(role_permissions__role=instance)  # Use 'role_permissions'
+        representation['permissions'] = PermissionSerializer(permissions, many=True).data
+        if 'permissions' not in representation:
+            representation['permissions'] = []
+        return representation
 
 class RolePermissionSerializer(serializers.ModelSerializer):
     class Meta:
