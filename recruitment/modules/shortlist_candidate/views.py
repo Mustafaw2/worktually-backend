@@ -10,7 +10,7 @@ class ShortlistCandidatesView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         api_key = os.getenv('API_KEY')
-        candidates_api_url = "http://localhost:8001/api/candidates/"
+        candidates_api_url = "https://seekerdev3-api.worktually.com/api/candidates/"
         headers = {
             'Authorization': f'Api-Key {api_key}'
         }
