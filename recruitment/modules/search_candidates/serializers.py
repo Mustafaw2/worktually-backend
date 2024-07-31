@@ -15,7 +15,7 @@ class CandidateSerializer(serializers.Serializer):
     def fetch_candidate(candidate_id):
         api_key = os.getenv("API_KEY")
         headers = {"Authorization": f"Api-Key {api_key}"}
-        url = f"http://localhost:8001/api/candidates/{candidate_id}/"
+        url = f"https://seekerdev3-api.worktually.com/api/candidates/{candidate_id}/"
         response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
