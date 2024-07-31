@@ -19,7 +19,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['dev3-api.worktually.com', '*']
+
 
 INSTALLED_APPS = [
     # 'django.contrib.admin',
