@@ -17,8 +17,8 @@ class SendInterviewRequestSerializer(serializers.ModelSerializer):
 
     def validate_candidate_id(self, value):
         # Fetch candidate details
-        api_key = settings.API_KEY  # Ensure you have the API key in your settings
-        candidate_api_url = f"http://localhost:8001/api/candidates/{value}/"
+        api_key = settings.API_KEY 
+        candidate_api_url = f"https://seekerdev3-api.worktually.com/api/candidates/{value}/"
         headers = {'Authorization': f'Api-Key {api_key}'}
         response = requests.get(candidate_api_url, headers=headers)
         
@@ -36,7 +36,7 @@ class SendInterviewRequestSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Job seeker ID not found in candidate data.")
         
         # Fetch job seeker details
-        job_seeker_api_url = f"http://localhost:8001/api/job_seeker/list/{job_seeker_id}/"
+        job_seeker_api_url = f"https://seekerdev3-api.worktually.com/api/job_seeker/list/{job_seeker_id}/"
         response = requests.get(job_seeker_api_url, headers=headers)
         
         if response.status_code != 200:
