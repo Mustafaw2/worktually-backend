@@ -7,7 +7,7 @@ class Invitation(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField()
-    location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, blank=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
     salary_type = models.CharField(max_length=50, choices=[('Monthly', 'Monthly'), ('Hourly', 'Hourly')])
     salary = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Accepted', 'Accepted'), ('Rejected', 'Rejected')], default='Pending')

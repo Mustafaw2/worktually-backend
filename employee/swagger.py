@@ -5,7 +5,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Your API",
+        title="Employee API",
         default_version='v1',
         description="Your API Description",
         terms_of_service="https://www.google.com/policies/terms/",

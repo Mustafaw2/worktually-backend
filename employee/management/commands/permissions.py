@@ -1,5 +1,3 @@
-# permissions.py
-
 from django.core.management.base import BaseCommand
 from employee.models import Role, Permission, Role_has_Permission, PermissionGroup
 

@@ -97,9 +97,3 @@ class ChangeCoverPictureSerializer(serializers.ModelSerializer):
         fields = ['cover_photo']
 
 
-class RoleSerializer(serializers.ModelSerializer):
-    created_by = serializers.StringRelatedField()
-
-    class Meta:
-        model = Role
-        fields = ['id', 'name', 'created_by']

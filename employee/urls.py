@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import AddEmployee
 from .modules.education_experience.views import *
 from .modules.skills_languages_portfolio.views import *
@@ -11,7 +11,6 @@ from .modules.roles_permissions.views import (
     RolesListView, AddRoleView, EditRoleView, DeleteRoleView, RoleDetailView, SyncPermissionsToRoleView,ViewPermissionGroup, EditPermissionsInGroup, AddPermissionsToRoleView, AddPermissionView,
 )
 from rest_framework.routers import DefaultRouter
-from .modules.lookups.models import *
 
 router = DefaultRouter()
 
@@ -69,5 +68,6 @@ urlpatterns = [
     path('forget-password/', ForgetPasswordView.as_view(), name='forget-password'),
     path('verify-otp/', VerifyOTPView.as_view(), name='verify-otp'),
     path('reset-password/', ResetPasswordView.as_view(), name='reset-password'),
+    path('', include('employee.modules.organization.urls')),
 
 ]
