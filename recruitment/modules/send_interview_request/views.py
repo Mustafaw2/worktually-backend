@@ -9,14 +9,24 @@ from rest_framework import status
 from recruitment.models import JobInterview
 from .serializers import *
 from rest_framework.permissions import IsAuthenticated
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class SendInterviewRequestView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        request_body=SendInterviewRequestSerializer,
+        responses={
+            201: openapi.Response("Interview request sent successfully."),
+            400: "Bad Request"
+        },
+    )
     def post(self, request):
         serializer = SendInterviewRequestSerializer(data=request.data)
         if serializer.is_valid():
             job_interview = serializer.save()
-            
+
             # Retrieve job seeker details from serializer context
             job_seeker_email = serializer.context.get('job_seeker_email')
             job_seeker_first_name = serializer.context.get('job_seeker_first_name')
@@ -26,7 +36,7 @@ class SendInterviewRequestView(APIView):
             interview_method_id = job_interview.interview_method_id
             start_date = job_interview.start_date
             end_date = job_interview.end_date
-            
+
             # Call the Celery task to send an email
             send_interview_notification.delay(
                 job_seeker_email,
@@ -36,7 +46,7 @@ class SendInterviewRequestView(APIView):
                 start_date,
                 end_date
             )
-            
+
             return Response({"message": "Interview request sent successfully."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
