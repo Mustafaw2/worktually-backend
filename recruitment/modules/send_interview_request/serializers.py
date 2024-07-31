@@ -13,6 +13,8 @@ class SendInterviewRequestSerializer(serializers.ModelSerializer):
             'event_id', 'rating', 'expired_at', 'cancel_reason'
         ]
 
+
+
     def validate_candidate_id(self, value):
         # Fetch candidate details
         api_key = settings.API_KEY  # Ensure you have the API key in your settings
@@ -82,12 +84,13 @@ class RescheduleInterviewSerializer(serializers.Serializer):
     reschedule_start_date = serializers.DateTimeField()
     reschedule_end_date = serializers.DateTimeField()
     reschedule_by = serializers.CharField(max_length=45)
-    cancel_reason = serializers.CharField(max_length=255, required=False)
+    cancel_reason = serializers.CharField(max_length=255, required=False, allow_blank=True)
 
     def validate(self, data):
         if data['reschedule_start_date'] >= data['reschedule_end_date']:
             raise serializers.ValidationError("Reschedule start date must be before end date.")
         return data
+    
 
 class AcceptRejectInterviewSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=[("Accepted", "Accepted"), ("Rejected", "Rejected")])

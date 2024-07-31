@@ -8,8 +8,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from recruitment.models import JobInterview
 from .serializers import *
+from rest_framework.permissions import IsAuthenticated
 
 class SendInterviewRequestView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = SendInterviewRequestSerializer(data=request.data)
         if serializer.is_valid():
@@ -53,12 +55,15 @@ class RescheduleInterviewView(APIView):
 
         serializer = RescheduleInterviewSerializer(data=request.data)
         if serializer.is_valid():
-            data = serializer.validated_data
-            job_interview.reschedule_start_date = data['reschedule_start_date']
-            job_interview.reschedule_end_date = data['reschedule_end_date']
-            job_interview.reschedule_by = data['reschedule_by']
-            job_interview.cancel_reason = data['cancel_reason']
-            job_interview.status = "Rescheduled"
+            reschedule_start_date = serializer.validated_data['reschedule_start_date']
+            reschedule_end_date = serializer.validated_data['reschedule_end_date']
+            reschedule_by = serializer.validated_data['reschedule_by']
+            cancel_reason = serializer.validated_data.get('cancel_reason', None)
+
+            job_interview.reschedule_start_date = reschedule_start_date
+            job_interview.reschedule_end_date = reschedule_end_date
+            job_interview.reschedule_by = reschedule_by
+            job_interview.cancel_reason = cancel_reason
             job_interview.save()
 
             return Response({"message": "Success", "data": SendInterviewRequestSerializer(job_interview).data}, status=status.HTTP_200_OK)

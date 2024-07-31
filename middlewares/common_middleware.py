@@ -1,22 +1,32 @@
 from django.utils.deprecation import MiddlewareMixin
 from django.http import JsonResponse
+from django.conf import settings
 from recruitment.models import APIKey
+import re
 
 class APIKeyMiddleware(MiddlewareMixin):
     def process_view(self, request, view_func, view_args, view_kwargs):
-
-        # Define paths or views that require API key
-        protected_paths = ['/api/recruitment/job-posts/', '/api/recruitment/job-posts/list/', '/api/organizations/']
+        # Define paths or views that require API key with regex for dynamic segments
+        protected_paths = [
+            r'^/api/recruitment/job-posts/$',
+            r'^/api/recruitment/job-posts/list/$',
+            r'^/api/organizations/$',
+            r'^/api/interviews/\d+/accept-reject/$',
+            r'^/api/interviews/\d+/reschedule/$',
+        ]
 
         # Exact paths to exempt
-        exempt_paths = ['/api/recruitment/job-posts/add', '/api/organizations/add']
+        exempt_paths = [
+            '/api/recruitment/job-posts/add',
+            '/api/organizations/add',
+        ]
 
         # Skip middleware for the exact exempt paths
         if request.path in exempt_paths:
             return None
 
         # Check if the request path requires an API key
-        if any(request.path.startswith(path) for path in protected_paths):
+        if any(re.fullmatch(path, request.path) for path in protected_paths):
             # Extract the API key from the 'Authorization' header
             authorization_header = request.headers.get('Authorization')
             
@@ -35,3 +45,4 @@ class APIKeyMiddleware(MiddlewareMixin):
 
         # Continue processing the view
         return None
+

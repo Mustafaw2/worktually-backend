@@ -37,12 +37,6 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    # path('api/register/', RegisterView.as_view(), name='register'),
-    # path('api/login/', LoginView.as_view(), name='login'),
-    # path('api/logout/', LogoutView.as_view(), name='logout'),
-    # path('api/forget-password/', ForgetPasswordView.as_view(), name='forget-password'),
-    # path('api/verify-otp/', VerifyOTPView.as_view(), name='verify-otp'),
-    # path('api/reset-password/', ResetPasswordView.as_view(), name='reset-password'),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
@@ -50,10 +44,7 @@ urlpatterns = [
     path('api/recruitment/', include('recruitment.urls')),
     path("api/", include('recruitment.modules.search_candidates.urls')),
     path("api/", include('recruitment.modules.send_interview_request.urls')),
-    path("api/", include('recruitment.modules.shortlist_candidate.urls')),
-
-
-    
+    path("api/", include('recruitment.modules.shortlist_candidate.urls')),    
 ]
 
 
