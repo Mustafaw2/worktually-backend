@@ -12,7 +12,7 @@ class JobPostSerializer(serializers.ModelSerializer):
         api_key = os.getenv("API_KEY")
         headers = {"Authorization": f"Api-Key {api_key}"}
         
-        response = requests.get(f"http://localhost:8000/api/organizations/{value}/", headers=headers)
+        response = requests.get(f"https://dev3-api.worktually.com/api/organizations/{value}/", headers=headers)
         
 
         if response.status_code != 200:

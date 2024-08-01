@@ -44,7 +44,8 @@ urlpatterns = [
     path('api/recruitment/', include('recruitment.urls')),
     path("api/", include('recruitment.modules.search_candidates.urls')),
     path("api/", include('recruitment.modules.send_interview_request.urls')),
-    path("api/", include('recruitment.modules.shortlist_candidate.urls')),    
+    path("api/", include('recruitment.modules.shortlist_candidate.urls')),   
+    path("api/", include('recruitment.modules.send_joboffer.urls')),   
 ]
 
 
