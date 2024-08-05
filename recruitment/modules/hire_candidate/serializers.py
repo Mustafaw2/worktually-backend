@@ -63,3 +63,12 @@ class HireCandidateSerializer(serializers.Serializer):
         if update_response.status_code != 200:
             raise serializers.ValidationError("Failed to update candidate status.")
 
+        # Return the validated data or any other relevant information
+        return {
+            "job_post_id": job_post_id,
+            "candidate_id": candidate_id,
+            "job_offer_id": job_offer_id,
+            "hire_date": hire_date,
+            "status": candidate_data['status']
+        }
+
