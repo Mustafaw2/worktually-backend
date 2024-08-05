@@ -27,3 +27,17 @@ def send_interview_notification(email, first_name, job_post_id, interview_method
         [email],
         fail_silently=False
     )
+
+
+
+@shared_task
+def send_job_offer_notification(email, first_name, job_post_id, amount, currency):
+    subject = "Job Offer Received"
+    message = f"Hi {first_name},\n\nYou have received a job offer for the job post ID {job_post_id} with an offer of {amount} {currency}.\n\nBest regards,\nYour Company"
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [email],
+        fail_silently=False
+    )
