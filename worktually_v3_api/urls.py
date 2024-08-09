@@ -47,6 +47,32 @@ urlpatterns = [
     path("api/", include('recruitment.modules.shortlist_candidate.urls')),   
     path("api/", include('recruitment.modules.send_joboffer.urls')),
     path("api/", include('recruitment.modules.hire_candidate.urls')),
+    path("api/", include('lookups.urls')),
+    path("api/", include("job_seekers.modules.accounts.urls")),
+    path("api/job_seeker/", include("job_seekers.modules.job_seeker.urls")),
+    path("api/education/", include("job_seekers.modules.education.urls")),
+    path("api/language/", include("job_seekers.modules.languages.urls")),
+    path("api/job_profile/", include("job_seekers.modules.job_profiles.urls")),
+    path("api/", include("job_seekers.modules.job_profiles.urls")),
+    path("api/experience/", include("job_seekers.modules.experience.urls")),
+    path("api/skill/", include("job_seekers.modules.skills.urls")),
+    path("api/", include("job_seekers.modules.job_assessment.urls")),
+    path("api/", include("job_seekers.modules.job_interviews.urls")),
+    path("api/", include("job_seekers.modules.job_recruitment.urls")),
+    path("api/", include("lookups.modules.states.urls")),
+    path("api/", include("lookups.modules.cities.urls")),
+    path("api/", include("lookups.modules.countries.urls")),
+    path("api/", include("job_seekers.modules.job_recruitment.job_search.urls")),
+    path("api/", include("job_seekers.modules.job_recruitment.apply_to_job.urls")),
+    path("api/", include("job_seekers.modules.job_recruitment.candidates.urls")),
+    path(
+        "api/",
+        include("job_seekers.modules.job_recruitment.accept_reject_joboffer.urls"),
+    ),
+    path(
+        "api/",
+        include("job_seekers.modules.job_recruitment.accept_reject_interview.urls"),
+    ),
 ]
 
 
