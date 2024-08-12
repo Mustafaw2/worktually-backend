@@ -30,31 +30,21 @@ class JobSeekerSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    password = serializers.CharField(
-        style={"input_type": "password"}, trim_whitespace=False
-    )
+    password = serializers.CharField(write_only=True)
 
-    def validate(self, attrs):
-        email = attrs.get("email")
-        password = attrs.get("password")
+    def validate(self, data):
+        email = data.get('email')
+        password = data.get('password')
 
         if email and password:
-            user = authenticate(
-                request=self.context.get("request"),
-                username=email,  # Use email as username
-                password=password,
-            )
-
+            user = authenticate(email=email, password=password)
             if not user:
-                msg = "Unable to log in with provided credentials."
-                raise serializers.ValidationError(msg, code="authorization")
-
+                raise serializers.ValidationError("Invalid email or password", code='authentication_failed')
         else:
-            msg = 'Must include "email" and "password".'
-            raise serializers.ValidationError(msg, code="authorization")
+            raise serializers.ValidationError("Both email and password are required", code='invalid_credentials')
 
-        attrs["user"] = user
-        return attrs
+        data['user'] = user
+        return data
 
 
 class LogoutSerializer(serializers.Serializer):

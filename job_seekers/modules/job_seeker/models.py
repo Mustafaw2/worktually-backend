@@ -68,6 +68,22 @@ class JobSeeker(AbstractBaseUser, PermissionsMixin):
     class Meta:
         app_label = 'job_seekers'
 
+    # Add related_name to avoid clashes with default User model
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='job_seeker_set',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        related_query_name='job_seeker',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='job_seeker_set',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_query_name='job_seeker',
+    )
+
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
 
@@ -100,7 +116,7 @@ class JobSeeker(AbstractBaseUser, PermissionsMixin):
         print(f"Languages points: {languages_points}")
 
         # Calculate experience points
-        experience_points = 1 if self.experiences.exists() else 0
+        experience_points = 1 if self.jobprofile_experiences.exists() else 0
         print(f"Experience points: {experience_points}")
 
         # Calculate skills score points

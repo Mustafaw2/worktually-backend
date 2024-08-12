@@ -12,7 +12,6 @@ from .models import (
     Settings,
     JobProfileAssessment,
     JobTitleAssessment,
-    ScreeningInterviewTemplate,
     JobProfileInterview,
     JobApplication,
     Candidate,
@@ -56,34 +55,34 @@ class ApprovalModelAdmin(admin.ModelAdmin):
     search_fields = ("job_seeker__email",)
 
 
-class ScreeningInterviewTemplateAdmin(admin.ModelAdmin):
-    list_display = ("name", "status", "added_by", "questions")
-    exclude = ("added_by",)
+# class ScreeningInterviewTemplateAdmin(admin.ModelAdmin):
+#     list_display = ("name", "status", "added_by", "questions")
+#     exclude = ("added_by",)
 
-    def save_model(self, request, obj, form, change):
-        if not obj.pk:  # If the object is being created
-            obj.added_by = request.user  # Assign the logged-in user to added_by
-            print(f"Adding screening interview template by user: {request.user}")
-        super().save_model(request, obj, form, change)
+#     def save_model(self, request, obj, form, change):
+#         if not obj.pk:  # If the object is being created
+#             obj.added_by = request.user  # Assign the logged-in user to added_by
+#             print(f"Adding screening interview template by user: {request.user}")
+#         super().save_model(request, obj, form, change)
 
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        if not request.user.is_superuser:
-            form.base_fields["added_by"].queryset = User.objects.filter(
-                pk=request.user.pk
-            )
-        return form
+#     def get_form(self, request, obj=None, **kwargs):
+#         form = super().get_form(request, obj, **kwargs)
+#         if not request.user.is_superuser:
+#             form.base_fields["added_by"].queryset = User.objects.filter(
+#                 pk=request.user.pk
+#             )
+#         return form
 
-    def has_add_permission(self, request):
-        # Only allow superusers to add new templates
-        return request.user.is_superuser
+#     def has_add_permission(self, request):
+#         # Only allow superusers to add new templates
+#         return request.user.is_superuser
 
-    def has_change_permission(self, request, obj=None):
-        # Allow change permission only for superusers
-        return request.user.is_superuser
+#     def has_change_permission(self, request, obj=None):
+#         # Allow change permission only for superusers
+#         return request.user.is_superuser
 
 
-admin.site.register(ScreeningInterviewTemplate, ScreeningInterviewTemplateAdmin)
+
 admin.site.register(JobSeeker, JobSeekerAdmin)
 admin.site.register(JobProfile)
 admin.site.register(Education, EducationAdmin)

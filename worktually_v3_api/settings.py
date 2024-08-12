@@ -23,7 +23,7 @@ ALLOWED_HOSTS = ['dev3-api.worktually.com', '*']
 
 
 INSTALLED_APPS = [
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -47,13 +47,12 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'middlewares.role_permission_middleware.PermissionMiddleware',
-    # 'recruitment.middleware.APIKeyMiddleware'
     'middlewares.common_middleware.APIKeyMiddleware'
 ]
 
@@ -178,7 +177,7 @@ SIMPLE_JWT = {
     'JTI_CLAIM': 'jti',
 }
 
-AUTH_USER_MODEL = 'employee.Employee'
+
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
@@ -205,3 +204,9 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+
+AUTHENTICATION_BACKENDS = [
+    "worktually_v3_api.custom_authentications.backends.EmployeeUserBackend",
+    'worktually_v3_api.custom_authentications.backends.JobSeekerUserBackend',
+    "django.contrib.auth.backends.ModelBackend",
+]

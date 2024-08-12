@@ -2,7 +2,7 @@ from django.db import models
 from employee.models import Employee
 
 class Education(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='educations')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='employee_educations')
     degree_title = models.CharField(max_length=100)
     degree_type = models.CharField(max_length=50)
     score = models.CharField(max_length=20)

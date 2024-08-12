@@ -4,7 +4,7 @@ from django.apps import apps
 
 class JobProfileExperience(models.Model):
     job_seeker = models.ForeignKey(
-        "job_seekers.JobSeeker", on_delete=models.CASCADE, related_name="experiences"
+        "job_seekers.JobSeeker", on_delete=models.CASCADE, related_name="jobprofile_experiences"
     )
     title = models.CharField(max_length=45)
     job_type_id = models.CharField(max_length=45)

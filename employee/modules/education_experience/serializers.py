@@ -7,6 +7,7 @@ class EducationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Education
+        ref_name = 'EmployeeEducationSerializer'
         fields = ['employee_id', 'degree_title', 'degree_type', 'score', 'major_subjects', 'date_of_completion', 'institute_name', 'degree_certificate']
 
     def validate_employee_id(self, value):

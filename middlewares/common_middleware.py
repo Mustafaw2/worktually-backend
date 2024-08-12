@@ -19,6 +19,7 @@ class APIKeyMiddleware(MiddlewareMixin):
         exempt_paths = [
             '/api/recruitment/job-posts/add',
             '/api/organizations/add',
+            '/admin/login/'
         ]
 
         # Skip middleware for the exact exempt paths

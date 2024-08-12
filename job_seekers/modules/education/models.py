@@ -4,7 +4,7 @@ from django.apps import apps
 
 class Education(models.Model):
     job_seeker = models.ForeignKey(
-        "job_seekers.JobSeeker", on_delete=models.CASCADE, related_name="education"
+        "job_seekers.JobSeeker", on_delete=models.CASCADE, related_name="Education"
     )
     title = models.CharField(max_length=45)
     education_type_id = models.CharField(max_length=45)

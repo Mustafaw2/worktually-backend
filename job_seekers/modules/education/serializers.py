@@ -5,6 +5,7 @@ from .models import Education
 class EducationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Education
+        ref_name = 'JobSeekerEducationSerializer'
         fields = [
             "id",
             "job_seeker",
