@@ -9,6 +9,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Employee
+        ref_name = "EmployeeLoginSerializer"
         fields = ['first_name', 'last_name', 'email', 'password', 'confirm_password']
         extra_kwargs = {'password': {'write_only': True}}
 
@@ -29,13 +30,15 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
+    class Meta:
+        ref_name = "EmployeeLoginSerializer"
+
     def validate(self, data):
         email = data.get('email')
         password = data.get('password')
 
         if email and password:
             user = authenticate(email=email, password=password)
-            print(user)
             if not user:
                 raise serializers.ValidationError("Invalid email or password", code='authentication_failed')
         else:
