@@ -19,7 +19,7 @@ class ScreeningInterviewTemplate(models.Model):
         ]
 
     class Meta:
-        app_label = 'job_seekers'
+        app_label = "job_seekers"
 
 
 class JobProfileInterview(models.Model):
@@ -34,6 +34,6 @@ class JobProfileInterview(models.Model):
 
     def __str__(self):
         return f"Interview for {self.job_profile}"
-    
+
     class Meta:
-        app_label = 'job_seekers'
+        app_label = "job_seekers"

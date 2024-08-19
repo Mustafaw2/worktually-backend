@@ -1,5 +1,8 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+from recruitment.models import Candidate, JobApplication
+
 from job_seekers.models import (
     JobSeeker,
     Education,
@@ -7,8 +10,6 @@ from job_seekers.models import (
     JobProfileExperience,
     Skills,
     JobProfileSkill,
-    JobApplication,
-    Candidate,
 )
 
 

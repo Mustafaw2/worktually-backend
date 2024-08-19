@@ -12,10 +12,13 @@ from drf_yasg import openapi
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import logout
 from .models import OTP
+from employee.modules.accounts.serializers import EmployeeTokenObtainPairSerializer
+from employee.models import Employee
 from .serializers import (
     ForgetPasswordSerializer,
     ResetPasswordRequestSerializer,
     VerifyOTPSerializer,
+    JobSeekerTokenObtainPairSerializer,
 )
 from django.conf import settings
 from django.core.mail import send_mail
@@ -88,23 +91,32 @@ class LoginView(APIView):
         if serializer.is_valid():
             email = serializer.validated_data["email"]
             password = serializer.validated_data["password"]
-            # Authenticate the user with email and password
             user = authenticate(request, email=email, password=password)
+
             if user is not None:
-                # Log the user in
-                login(request, user)
-                # Generate tokens for the logged-in user
-                refresh = RefreshToken.for_user(user)
+                if isinstance(user, Employee):
+                    token_serializer = EmployeeTokenObtainPairSerializer
+                elif isinstance(user, JobSeeker):
+                    token_serializer = JobSeekerTokenObtainPairSerializer
+                else:
+                    return Response(
+                        {"message": "Invalid user type"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                refresh = token_serializer.get_token(user)
+
                 return Response(
                     {
                         "status": "success",
                         "refresh": str(refresh),
                         "access": str(refresh.access_token),
-                    }
+                    },
+                    status=status.HTTP_200_OK,
                 )
             else:
                 return Response(
-                    {"status": "error", "message": "Invalid email or password"},
+                    {"message": "Invalid email or password"},
                     status=status.HTTP_401_UNAUTHORIZED,
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

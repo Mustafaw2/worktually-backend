@@ -9,6 +9,3 @@ from .modules.settings.models import *
 from .modules.job_assessment.models import *
 from .modules.accounts.models import *
 from .modules.job_interviews.models import *
-from .modules.job_recruitment.models import *
-from .modules.job_recruitment.apply_to_job.models import *
-from .modules.job_recruitment.candidates.models import *

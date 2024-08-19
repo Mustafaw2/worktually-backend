@@ -5,9 +5,11 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from job_seekers.modules.experience.models import JobProfileExperience
 from job_seekers.modules.experience.serializers import JobProfileExperienceSerializer
+from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
 
 
 class AddExperienceView(generics.CreateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobProfileExperience.objects.all()
     serializer_class = JobProfileExperienceSerializer
     permission_classes = [IsAuthenticated]
@@ -40,6 +42,7 @@ class AddExperienceView(generics.CreateAPIView):
 
 
 class UpdateExperienceView(generics.UpdateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobProfileExperience.objects.all()
     serializer_class = JobProfileExperienceSerializer
     permission_classes = [IsAuthenticated]
@@ -76,6 +79,7 @@ class UpdateExperienceView(generics.UpdateAPIView):
 
 
 class DeleteExperienceView(generics.DestroyAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobProfileExperience.objects.all()
     serializer_class = JobProfileExperienceSerializer
     permission_classes = [IsAuthenticated]

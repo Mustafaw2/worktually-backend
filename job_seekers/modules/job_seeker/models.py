@@ -54,7 +54,6 @@ class JobSeeker(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
-
     objects = JobSeekerManager()
 
     USERNAME_FIELD = "email"
@@ -66,22 +65,22 @@ class JobSeeker(AbstractBaseUser, PermissionsMixin):
         ]
 
     class Meta:
-        app_label = 'job_seekers'
+        app_label = "job_seekers"
 
     # Add related_name to avoid clashes with default User model
     groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='job_seeker_set',
+        "auth.Group",
+        related_name="job_seeker_set",
         blank=True,
-        help_text='The groups this user belongs to.',
-        related_query_name='job_seeker',
+        help_text="The groups this user belongs to.",
+        related_query_name="job_seeker",
     )
     user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        related_name='job_seeker_set',
+        "auth.Permission",
+        related_name="job_seeker_set",
         blank=True,
-        help_text='Specific permissions for this user.',
-        related_query_name='job_seeker',
+        help_text="Specific permissions for this user.",
+        related_query_name="job_seeker",
     )
 
     def get_full_name(self):
@@ -108,7 +107,7 @@ class JobSeeker(AbstractBaseUser, PermissionsMixin):
         print(f"Profile picture points: {profile_picture_points}")
 
         # Calculate education points
-        education_points = 1 if self.education.exists() else 0
+        education_points = 1 if self.Education.exists() else 0
         print(f"Education points: {education_points}")
 
         # Calculate languages points
@@ -169,9 +168,8 @@ class ApprovalModel(models.Model):
             self.is_approved = False
         self.save()
 
-
     class Meta:
-        app_label = 'job_seekers'
+        app_label = "job_seekers"
 
     def __str__(self):
         return f"Approval for {self.job_seeker.first_name} {self.job_seeker.last_name}"

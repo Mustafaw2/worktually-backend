@@ -4,12 +4,13 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
+from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
 from .models import Education
 from .serializers import EducationSerializer
 
 
 class AddEducationView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
@@ -41,6 +42,7 @@ class AddEducationView(APIView):
 
 
 class UpdateEducationView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
@@ -86,6 +88,7 @@ class UpdateEducationView(APIView):
 
 
 class DeleteEducationView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(

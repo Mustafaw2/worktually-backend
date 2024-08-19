@@ -13,7 +13,7 @@ from .models import (
     Language,
     Location,
     Portfolio,
-    OTP
+    OTP,
 )
 
 admin.site.register(Education)
@@ -28,9 +28,9 @@ admin.site.register(Location)
 admin.site.register(Portfolio)
 admin.site.register(Invitation)
 admin.site.register(OTP)
+
+
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'email', 'is_active', 'is_staff')
-    search_fields = ('first_name', 'last_name', 'email')
-
-
+    list_display = ("first_name", "last_name", "email", "is_active", "is_staff")
+    search_fields = ("first_name", "last_name", "email")

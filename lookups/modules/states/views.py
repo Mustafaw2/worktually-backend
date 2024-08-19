@@ -9,7 +9,6 @@ from drf_yasg import openapi
 
 
 class StateListView(APIView):
-
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(

@@ -9,7 +9,7 @@ class Language(models.Model):
     level = models.CharField(max_length=45)
 
     class Meta:
-        app_label = 'job_seekers'
+        app_label = "job_seekers"
 
     def __str__(self):
         return self.language_id

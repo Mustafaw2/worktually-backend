@@ -13,11 +13,8 @@ from .models import (
     JobProfileAssessment,
     JobTitleAssessment,
     JobProfileInterview,
-    JobApplication,
-    Candidate,
     ScreeningInterviewTemplate,
     JobProfileInterview,
-    JobApplication,
     JobTitleAssessment,
 )
 from django.contrib.auth import get_user_model
@@ -82,7 +79,6 @@ class ApprovalModelAdmin(admin.ModelAdmin):
 #         return request.user.is_superuser
 
 
-
 admin.site.register(JobSeeker, JobSeekerAdmin)
 admin.site.register(JobProfile)
 admin.site.register(Education, EducationAdmin)
@@ -92,7 +88,6 @@ admin.site.register(ApprovalModel, ApprovalModelAdmin)
 admin.site.register(Settings)
 admin.site.register(JobTitleAssessment)
 admin.site.register(JobProfileInterview)
-admin.site.register(JobApplication)
-admin.site.register(Candidate)
 admin.site.register(JobProfileAssessment)
+admin.site.register(ScreeningInterviewTemplate)
 admin.site.register(OTP)

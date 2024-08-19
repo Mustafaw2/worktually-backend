@@ -23,9 +23,12 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 import json
 from .models import JobProfileAssessment
+from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
 
 
 class GetAssessmentQuestionsView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
+
     @swagger_auto_schema(
         request_body=GetAssessmentQuestionsSerializer,
         responses={
@@ -129,6 +132,8 @@ class GetAssessmentQuestionsView(APIView):
 
 
 class AssessmentResultView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
+
     @swagger_auto_schema(
         request_body=AssessmentResultRequestSerializer,
         responses={200: AssessmentResultRequestSerializer, 400: "Bad Request"},
@@ -208,6 +213,8 @@ class AssessmentResultView(APIView):
 
 
 class GetResultsView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
+
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(

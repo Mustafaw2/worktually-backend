@@ -10,9 +10,11 @@ from .serializers import (
     ScreeningInterviewTemplateSerializer,
     JobProfileInterviewSerializer,
 )
+from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
 
 
 class ScreeningInterviewTemplateQuestionsView(generics.RetrieveAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     serializer_class = ScreeningInterviewTemplateSerializer
     permission_classes = [permissions.AllowAny]
 
@@ -126,6 +128,7 @@ class RetrieveInterviewQuestionsView(APIView):
 
 
 class JobProfileInterviewSubmitView(generics.CreateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobProfileInterview.objects.all()
     serializer_class = JobProfileInterviewSerializer
     permission_classes = [permissions.AllowAny]

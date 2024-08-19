@@ -44,7 +44,7 @@ from django.db import models
 
 #     def __str__(self):
 #         return self.email
-    
+
 
 class OTP(models.Model):
     email = models.EmailField()
@@ -55,7 +55,7 @@ class OTP(models.Model):
 
     @staticmethod
     def generate_otp():
-        return ''.join(random.choices(string.digits, k=6))
+        return "".join(random.choices(string.digits, k=6))
 
     def __str__(self):
-        return f'{self.email} - {self.otp}'
+        return f"{self.email} - {self.otp}"

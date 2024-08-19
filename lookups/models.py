@@ -15,8 +15,8 @@ from django.db import models
 
 class Country(models.Model):
     name = models.CharField(max_length=100, default="")
-    iso3 = models.CharField(max_length=3, default="")
-    iso2 = models.CharField(max_length=2, default="")
+    iso3 = models.CharField(max_length=100, default="")
+    iso2 = models.CharField(max_length=100, default="")
     phone_code = models.CharField(max_length=20, default="")
     capital = models.CharField(max_length=255, default="")
     currency = models.CharField(max_length=255, default="")
@@ -45,8 +45,8 @@ class City(models.Model):
     state = models.ForeignKey("State", on_delete=models.CASCADE)
     country_id = models.IntegerField(null=True, blank=True)
     country_code = models.CharField(max_length=10, default="", blank=True)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    latitude = models.FloatField()  
+    longitude = models.FloatField()
 
     class Meta:
         db_table = "lookup_city"

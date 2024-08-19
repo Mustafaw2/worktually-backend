@@ -42,7 +42,7 @@
 #             serializer.save(user=request.user)
 #             return Response({"message": "Skill added successfully.", "data": serializer.data}, status=status.HTTP_201_CREATED)
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 # class DeleteSkillView(APIView):
 #     permission_classes = [IsAuthenticated]
 

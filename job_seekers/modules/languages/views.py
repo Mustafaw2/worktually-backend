@@ -4,12 +4,13 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
+from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
 from .models import Language
 from .serializers import LanguageSerializer
 
 
 class AddLanguageView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
@@ -39,6 +40,7 @@ class AddLanguageView(APIView):
 
 
 class UpdateLanguageView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
@@ -77,6 +79,7 @@ class UpdateLanguageView(APIView):
 
 
 class DeleteLanguageView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(

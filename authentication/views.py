@@ -10,7 +10,7 @@ from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .serializers import (
-    VerifyOTPSerializer, 
+    VerifyOTPSerializer,
 )
 from .models import OTP
 
@@ -89,7 +89,7 @@ from .models import OTP
 #             else:
 #                 return Response({'message': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 # class LogoutView(APIView):
 #     permission_classes = [IsAuthenticated]
@@ -107,7 +107,7 @@ from .models import OTP
 #             logout(request)
 #             return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 # class ForgetPasswordView(APIView):
 #     permission_classes = [AllowAny]
@@ -135,6 +135,7 @@ from .models import OTP
 #             return Response({"message": "OTP has been sent to your email."}, status=status.HTTP_200_OK)
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class VerifyOTPView(APIView):
     permission_classes = [AllowAny]
 
@@ -142,25 +143,34 @@ class VerifyOTPView(APIView):
         request_body=VerifyOTPSerializer,
         responses={
             200: "OTP verified successfully. A password reset link has been sent to your email.",
-            400: "Bad Request"
-        }
+            400: "Bad Request",
+        },
     )
     def post(self, request):
         serializer = VerifyOTPSerializer(data=request.data)
         if serializer.is_valid():
-            otp_instance = OTP.objects.get(email=serializer.validated_data['email'], otp=serializer.validated_data['otp'])
+            otp_instance = OTP.objects.get(
+                email=serializer.validated_data["email"],
+                otp=serializer.validated_data["otp"],
+            )
             otp_instance.is_verified = True
             otp_instance.save()
             reset_link = f"{request.scheme}://{request.get_host()}/api/reset-password/?token={otp_instance.reset_token}"
             send_mail(
-                'Reset Your Password',
-                f'Click the link to reset your password: {reset_link}',
+                "Reset Your Password",
+                f"Click the link to reset your password: {reset_link}",
                 settings.DEFAULT_FROM_EMAIL,
                 [otp_instance.email],
                 fail_silently=False,
             )
-            return Response({"message": "OTP verified successfully. A password reset link has been sent to your email."}, status=status.HTTP_200_OK)
+            return Response(
+                {
+                    "message": "OTP verified successfully. A password reset link has been sent to your email."
+                },
+                status=status.HTTP_200_OK,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # class ResetPasswordView(APIView):
 #     permission_classes = [AllowAny]

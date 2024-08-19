@@ -1,7 +1,12 @@
 from django.db import models
-from recruitment.modules.API_keys.models import APIKey
+from recruitment.organization_recruitment.API_keys.models import APIKey
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from job_seekers.models import JobProfile, JobSeeker
 import requests
 import os
+
+
 class JobPost(models.Model):
     organization_id = models.IntegerField(null=True, blank=True)
     manager_id = models.IntegerField()
@@ -25,7 +30,7 @@ class JobPost(models.Model):
 
     def __str__(self):
         return f"JobPost {self.id}: {self.description[:50]}..."
-    
+
 
 class JobInterview(models.Model):
     jobpost_id = models.ForeignKey(JobPost, on_delete=models.CASCADE)
@@ -47,6 +52,7 @@ class JobInterview(models.Model):
     def __str__(self):
         return f"JobInterview {self.id} for JobPost {self.job_post_id}"
 
+
 class JobOffer(models.Model):
     job_post_id = models.IntegerField()
     candidate_id = models.CharField(max_length=45)
@@ -60,3 +66,46 @@ class JobOffer(models.Model):
 
     def __str__(self):
         return f"JobOffer {self.id} for JobPost {self.job_post_id}"
+
+
+class JobApplication(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", _("Pending")
+        SHORTLISTED = "shortlisted", _("Shortlisted")
+        REJECTED = "rejected", _("Rejected")
+
+    job_id = models.IntegerField()
+    job_seeker = models.ForeignKey(
+        JobSeeker, on_delete=models.CASCADE, related_name="applications"
+    )
+    job_profile = models.ForeignKey(
+        JobProfile, on_delete=models.CASCADE, related_name="applications"
+    )
+    date_applied = models.DateTimeField(default=timezone.now)
+    source = models.CharField(max_length=255)
+    is_applied = models.BooleanField(default=False)
+    status = models.CharField(
+        max_length=12,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+
+    class Meta:
+        app_label = "recruitment"
+
+
+class Candidate(models.Model):
+    job_application_id = models.ForeignKey(
+        JobApplication, on_delete=models.CASCADE, related_name="job_applications"
+    )
+    job_profile_id = models.ForeignKey(
+        JobProfile, on_delete=models.CASCADE, related_name="candidates"
+    )
+    job_seeker_id = models.ForeignKey(
+        JobSeeker, on_delete=models.CASCADE, related_name="candidates"
+    )
+    status = models.CharField(max_length=45)
+    expected_start_date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Candidate {self.id}"

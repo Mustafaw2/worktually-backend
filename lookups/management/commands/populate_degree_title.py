@@ -1,7 +1,8 @@
 import os
 import json
 from django.core.management.base import BaseCommand
-from job_seekers.models import JobTitle, DegreeType
+from job_seekers.models import JobTitle
+from lookups.models import DegreeType
 
 
 class Command(BaseCommand):

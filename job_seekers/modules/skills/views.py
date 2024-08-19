@@ -20,9 +20,11 @@ from job_seekers.modules.skills.serializers import (
     AddSkillsToJobProfileSerializer,
     JobProfileSkillSerializer,
 )
+from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
 
 
 class AddSkillCategoryView(generics.CreateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = SkillCategory.objects.all()
     serializer_class = SkillCategorySerializer
     permission_classes = [IsAuthenticated]
@@ -55,6 +57,7 @@ class AddSkillCategoryView(generics.CreateAPIView):
 
 
 class UpdateSkillCategoryView(generics.UpdateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = SkillCategory.objects.all()
     serializer_class = SkillCategorySerializer
     permission_classes = [IsAuthenticated]
@@ -91,6 +94,7 @@ class UpdateSkillCategoryView(generics.UpdateAPIView):
 
 
 class DeleteSkillCategoryView(generics.DestroyAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = SkillCategory.objects.all()
     serializer_class = SkillCategorySerializer
     permission_classes = [IsAuthenticated]
@@ -114,6 +118,7 @@ class DeleteSkillCategoryView(generics.DestroyAPIView):
 
 
 class AddSkillsToJobProfileView(generics.CreateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = AddSkillsToJobProfileSerializer
 
@@ -174,6 +179,7 @@ class AddSkillsToJobProfileView(generics.CreateAPIView):
 
 
 class UpdateSkillView(generics.UpdateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = Skills.objects.all()
     serializer_class = SkillSerializer
     permission_classes = [IsAuthenticated]
@@ -205,6 +211,7 @@ class UpdateSkillView(generics.UpdateAPIView):
 
 
 class DeleteSkillView(generics.DestroyAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = Skills.objects.all()
     serializer_class = SkillSerializer
     permission_classes = [IsAuthenticated]
@@ -228,6 +235,7 @@ class DeleteSkillView(generics.DestroyAPIView):
 
 
 class AddJobProfileSkillView(generics.CreateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobProfileSkill.objects.all()
     serializer_class = AddSkillsToJobProfileSerializer
     permission_classes = [IsAuthenticated]
@@ -291,6 +299,7 @@ class AddJobProfileSkillView(generics.CreateAPIView):
 
 
 class UpdateJobProfileSkillView(generics.UpdateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobProfileSkill.objects.all()
     serializer_class = SkillSerializer
     permission_classes = [IsAuthenticated]
@@ -327,6 +336,7 @@ class UpdateJobProfileSkillView(generics.UpdateAPIView):
 
 
 class DeleteJobProfileSkillView(generics.DestroyAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobProfileSkill.objects.all()
     serializer_class = SkillSerializer
     permission_classes = [IsAuthenticated]

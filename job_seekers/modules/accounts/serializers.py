@@ -2,6 +2,7 @@ from rest_framework import serializers
 from job_seekers.modules.job_seeker.models import JobSeeker
 from django.contrib.auth import authenticate
 from .models import OTP
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class JobSeekerSerializer(serializers.ModelSerializer):
@@ -36,17 +37,26 @@ class LoginSerializer(serializers.Serializer):
         ref_name = "JobSeekersLoginSerializer"
 
     def validate(self, data):
-        email = data.get('email')
-        password = data.get('password')
+        email = data.get("email")
+        password = data.get("password")
+        print("Validating data:", data)
+        email = data.get("email")
+        password = data.get("password")
+        username_field = "email"
 
         if email and password:
-            user = authenticate(email=email, password=password)
+            # Explicitly specify the custom authentication backends
+            user = authenticate(request=None, email=email, password=password)
             if not user:
-                raise serializers.ValidationError("Invalid email or password", code='authentication_failed')
+                raise serializers.ValidationError(
+                    "Invalid email or password", code="authentication_failed"
+                )
         else:
-            raise serializers.ValidationError("Both email and password are required", code='invalid_credentials')
+            raise serializers.ValidationError(
+                "Both email and password are required", code="invalid_credentials"
+            )
 
-        data['user'] = user
+        data["user"] = user
         return data
 
 
@@ -101,3 +111,15 @@ class ResetPasswordRequestSerializer(serializers.Serializer):
         # Invalidate the OTP and token after successful password reset
         otp_instance.delete()
         return validated_data
+
+
+class JobSeekerTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims based on user type
+        if isinstance(user, JobSeeker):
+            token["role"] = "job_seeker"
+
+        return token

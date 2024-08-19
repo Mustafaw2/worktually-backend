@@ -2,6 +2,7 @@ from django.db import models
 from employee.modules.users.models import Employee
 from django.conf import settings
 
+
 class Dependent(models.Model):
     employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)

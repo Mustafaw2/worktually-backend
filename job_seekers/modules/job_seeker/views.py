@@ -7,9 +7,11 @@ from drf_yasg import openapi
 from .models import JobSeeker
 from .serializers import BasicProfileSerializer
 from rest_framework import generics, status
+from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
 
 
 class JobSeekerDetailView(generics.RetrieveAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobSeeker.objects.all()
     serializer_class = BasicProfileSerializer
     # permission_classes = [IsAuthenticated]
@@ -38,6 +40,7 @@ class JobSeekerDetailView(generics.RetrieveAPIView):
 
 
 class AddBasicProfileView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
@@ -73,6 +76,7 @@ class AddBasicProfileView(APIView):
 
 
 class UpdateBasicProfileView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
@@ -117,6 +121,7 @@ class UpdateBasicProfileView(APIView):
 
 
 class DeleteBasicProfileView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(

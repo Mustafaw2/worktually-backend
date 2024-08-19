@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
 from rest_framework.views import APIView
 from job_seekers.modules.settings.models import Settings
 from django.db import transaction
@@ -16,6 +17,7 @@ from job_seekers.modules.job_profiles.serializers import (
 
 
 class GetJobProfileInfo(generics.ListAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     serializer_class = JobProfileSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = [IsAuthenticated]
@@ -51,6 +53,8 @@ class GetJobProfileInfo(generics.ListAPIView):
 
 
 class JobProfileDetailView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
+
     @swagger_auto_schema(
         responses={200: JobProfileSerializer(), 400: "Bad Request", 404: "Not Found"}
     )
@@ -68,6 +72,7 @@ class JobProfileDetailView(APIView):
 
 
 class AddJobProfileView(generics.CreateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobProfile.objects.all()
     serializer_class = JobProfileSerializer
     permission_classes = [IsAuthenticated]
@@ -123,6 +128,7 @@ class AddJobProfileView(generics.CreateAPIView):
 
 
 class UpdateJobProfileView(generics.UpdateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobProfile.objects.all()
     serializer_class = JobProfileSerializer
     permission_classes = [IsAuthenticated]
@@ -156,6 +162,7 @@ class UpdateJobProfileView(generics.UpdateAPIView):
 
 
 class DeleteJobProfileView(generics.DestroyAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobProfile.objects.all()
     serializer_class = JobProfileSerializer
     permission_classes = [IsAuthenticated]
@@ -179,6 +186,7 @@ class DeleteJobProfileView(generics.DestroyAPIView):
 
 
 class AddJobProfilePortfolioView(generics.CreateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobProfilePortfolio.objects.all()
     serializer_class = JobProfilePortfolioSerializer
     permission_classes = [IsAuthenticated]
@@ -211,6 +219,7 @@ class AddJobProfilePortfolioView(generics.CreateAPIView):
 
 
 class UpdateJobProfilePortfolioView(generics.UpdateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobProfilePortfolio.objects.all()
     serializer_class = JobProfilePortfolioSerializer
     permission_classes = [IsAuthenticated]
@@ -247,6 +256,7 @@ class UpdateJobProfilePortfolioView(generics.UpdateAPIView):
 
 
 class DeleteJobProfilePortfolioView(generics.DestroyAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
     queryset = JobProfilePortfolio.objects.all()
     serializer_class = JobProfilePortfolioSerializer
     permission_classes = [IsAuthenticated]

@@ -6,7 +6,7 @@ class Settings(models.Model):
     value = models.CharField(max_length=255)
 
     class Meta:
-        app_label = 'job_seekers'
+        app_label = "job_seekers"
 
     def __str__(self):
         return self.key

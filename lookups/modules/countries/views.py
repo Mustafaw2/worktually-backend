@@ -8,7 +8,6 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class CountryView(APIView):
-
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(

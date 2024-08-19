@@ -55,16 +55,18 @@ from rest_framework_simplejwt.tokens import RefreshToken
 #             raise serializers.ValidationError("No user is associated with this email.")
 #         return value
 
+
 class VerifyOTPSerializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.CharField(max_length=6)
 
     def validate(self, data):
-        email = data.get('email')
-        otp = data.get('otp')
+        email = data.get("email")
+        otp = data.get("otp")
         if not OTP.objects.filter(email=email, otp=otp, is_verified=False).exists():
             raise serializers.ValidationError("Invalid OTP.")
         return data
+
 
 # class ResetPasswordRequestSerializer(serializers.Serializer):
 #     email = serializers.EmailField()

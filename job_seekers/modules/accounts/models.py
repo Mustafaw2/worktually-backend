@@ -17,7 +17,6 @@ class OTP(models.Model):
 
     def __str__(self):
         return f"{self.email} - {self.otp}"
-    
 
     class Meta:
-        app_label = 'job_seekers'
+        app_label = "job_seekers"
