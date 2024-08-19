@@ -24,10 +24,12 @@ from django.http import JsonResponse
 import json
 from .models import JobProfileAssessment
 from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 class GetAssessmentQuestionsView(APIView):
     authentication_classes = [JobSeekerJWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         request_body=GetAssessmentQuestionsSerializer,
@@ -133,6 +135,7 @@ class GetAssessmentQuestionsView(APIView):
 
 class AssessmentResultView(APIView):
     authentication_classes = [JobSeekerJWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         request_body=AssessmentResultRequestSerializer,
@@ -214,6 +217,7 @@ class AssessmentResultView(APIView):
 
 class GetResultsView(APIView):
     authentication_classes = [JobSeekerJWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         manual_parameters=[
