@@ -34,10 +34,9 @@ class SendJobOfferView(APIView):
         )
 
 
-
-
 class RetrieveJobOfferView(APIView):
     authentication_classes = [EmployeeJWTAuthentication]
+
     @swagger_auto_schema(
         responses={200: JobOfferSerializer(), 404: "Job offer not found"}
     )

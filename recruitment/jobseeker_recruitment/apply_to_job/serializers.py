@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from job_seekers.models import JobProfile
 from recruitment.models import JobApplication
-from job_seekers.tasks import send_job_application_notification 
+from job_seekers.tasks import send_job_application_notification
+
 
 class JobApplicationSerializer(serializers.ModelSerializer):
     class Meta:

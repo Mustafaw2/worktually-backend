@@ -45,7 +45,7 @@ class City(models.Model):
     state = models.ForeignKey("State", on_delete=models.CASCADE)
     country_id = models.IntegerField(null=True, blank=True)
     country_code = models.CharField(max_length=10, default="", blank=True)
-    latitude = models.FloatField()  
+    latitude = models.FloatField()
     longitude = models.FloatField()
 
     class Meta:

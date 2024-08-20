@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("lookups", "0003_alter_country_iso2_alter_country_iso3"),
     ]

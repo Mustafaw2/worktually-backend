@@ -46,7 +46,9 @@ class HireCandidateSerializer(serializers.Serializer):
         # Fetch the candidate instance and update its status to 'Hired'
         candidate = Candidate.objects.get(id=candidate_id)
         candidate.status = "Hired"
-        candidate.hire_date = hire_date  # Assuming there's a hire_date field in Candidate
+        candidate.hire_date = (
+            hire_date  # Assuming there's a hire_date field in Candidate
+        )
         candidate.save()
 
         # Return the validated data or any other relevant information

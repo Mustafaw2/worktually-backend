@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 class AcceptRejectInterviewView(APIView):
     authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         request_body=AcceptRejectInterviewSerializer,
         responses={
@@ -39,6 +40,7 @@ class AcceptRejectInterviewView(APIView):
 class RescheduleInterviewView(APIView):
     authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         request_body=RescheduleInterviewSerializer,
         responses={

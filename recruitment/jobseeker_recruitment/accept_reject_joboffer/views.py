@@ -11,6 +11,7 @@ from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
 class AcceptRejectJobOfferView(APIView):
     authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         request_body=AcceptRejectJobOfferSerializer,
         responses={

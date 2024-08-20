@@ -8,7 +8,7 @@ from recruitment.models import JobInterview
 class InterviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobInterview
-        fields = '__all__'
+        fields = "__all__"
 
 
 class AcceptRejectInterviewSerializer(serializers.Serializer):

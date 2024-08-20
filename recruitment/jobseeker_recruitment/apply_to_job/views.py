@@ -6,9 +6,14 @@ from .serializers import JobApplicationSerializer
 from recruitment.models import JobApplication
 from job_seekers.models import JobProfile
 from recruitment.models import JobPost
+from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 class ApplyToJobView(generics.CreateAPIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     serializer_class = JobApplicationSerializer
 
     @swagger_auto_schema(

@@ -67,6 +67,9 @@ class LogoutSerializer(serializers.Serializer):
 class ForgetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
+    class Meta:
+        ref_name = "JobSeekersForgetPasswordSerializer"
+
     def validate_email(self, value):
         if not JobSeeker.objects.filter(email=value).exists():
             raise serializers.ValidationError("This email is not registered.")
@@ -76,6 +79,9 @@ class ForgetPasswordSerializer(serializers.Serializer):
 class VerifyOTPSerializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.CharField(max_length=6)
+
+    class Meta:
+        ref_name = "JobSeekersVerifyOTPSerializer"
 
     def validate(self, data):
         email = data.get("email")
@@ -90,6 +96,9 @@ class ResetPasswordRequestSerializer(serializers.Serializer):
     token = serializers.UUIDField()
     new_password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
+
+    class Meta:
+        ref_name = "JobSeekerResetPasswordRequestSerializer"
 
     def validate(self, data):
         email = data.get("email")

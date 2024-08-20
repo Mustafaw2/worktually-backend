@@ -30,4 +30,7 @@ router.register(r"languages", LanguageViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("api/", include("lookups.modules.states.urls")),
+    path("api/", include("lookups.modules.cities.urls")),
+    path("api/", include("lookups.modules.countries.urls")),
 ]

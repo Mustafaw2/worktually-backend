@@ -9,6 +9,7 @@ from .email_templates import (
     get_job_application_email_body,
 )
 
+
 @shared_task
 def send_job_application_notification(job_application_id):
     # Get job application details
@@ -54,4 +55,3 @@ def send_job_application_notification(job_application_id):
         [organization_email],
         fail_silently=False,
     )
-
