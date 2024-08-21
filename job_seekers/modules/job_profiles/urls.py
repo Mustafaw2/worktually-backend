@@ -25,7 +25,7 @@ urlpatterns = [
         name="delete_portfolio",
     ),
     path(
-        "job_profile/info/",
+        "info/",
         GetJobProfileInfo.as_view(),
         name="get_completion_rate",
     ),

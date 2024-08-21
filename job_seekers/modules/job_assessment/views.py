@@ -67,7 +67,6 @@ class GetAssessmentQuestionsView(APIView):
 
             try:
                 job_title = JobTitle.objects.get(id=job_title_id)
-                print(job_title)
 
                 # Check if the profile is eligible for assessment
                 is_eligible, job_profile = is_profile_eligible_for_assessment(
@@ -88,8 +87,6 @@ class GetAssessmentQuestionsView(APIView):
                     job_profile_skill.skill.name
                     for job_profile_skill in job_profile_skills
                 ]
-                print(skills)
-
                 # Generate questions using Gemini API
                 questions = generate_assessment_questions(job_title.name, skills)
 

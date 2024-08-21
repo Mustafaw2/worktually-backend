@@ -7,14 +7,7 @@ class JobProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = JobProfile
-        fields = [
-            "job_seeker",
-            "job_title",
-            "ssn_cnic_passport",
-            "state",
-            "city",
-            "address",
-        ]
+        fields = "__all__"
         read_only_fields = ["status"]
 
 
