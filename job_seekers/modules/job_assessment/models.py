@@ -1,20 +1,7 @@
 from django.utils import timezone
 from django.db import models
-
-
-class JobTitle(models.Model):
-    name = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        indexes = [
-            models.Index(fields=["id"]),
-        ]
-
-    class Meta:
-        app_label = "job_seekers"
+from lookups.models import Department
+from lookups.models import JobTitle
 
 
 class JobTitleAssessment(models.Model):

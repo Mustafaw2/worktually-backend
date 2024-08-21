@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404
 from job_seekers.modules.job_profiles.serializers import (
     JobProfileSerializer,
     JobProfilePortfolioSerializer,
+    JobProfileInfoSerializer
 )
 
 
@@ -32,7 +33,7 @@ class GetJobProfileInfo(generics.ListAPIView):
 
     @swagger_auto_schema(
         operation_description="Get the completion rates of job profiles with pagination",
-        responses={200: JobProfileSerializer(many=True)},
+        responses={200: JobProfileInfoSerializer(many=True)},
         manual_parameters=[
             openapi.Parameter(
                 "page",

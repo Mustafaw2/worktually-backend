@@ -33,8 +33,6 @@ class SendInterviewRequestView(APIView):
             # Retrieve job seeker details from serializer context
             job_seeker_email = serializer.context.get("job_seeker_email")
             job_seeker_first_name = serializer.context.get("job_seeker_first_name")
-            print(job_seeker_email)
-
             # Extract necessary fields from job_interview
             job_post_id = job_interview.jobpost_id.id
             interview_method_id = job_interview.interview_method_id

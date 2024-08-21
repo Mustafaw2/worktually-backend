@@ -53,6 +53,7 @@ class City(models.Model):
         app_label = "lookups"
 
 
+
 class Designation(models.Model):
     name = models.CharField(max_length=100)
     status = models.CharField(max_length=50)
@@ -68,6 +69,20 @@ class Department(models.Model):
 
     class Meta:
         db_table = "lookup_department"
+        app_label = "lookups"
+
+
+class JobTitle(models.Model):
+    name = models.CharField(max_length=200)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="job_titles")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["id"]),
+        ]
         app_label = "lookups"
 
 

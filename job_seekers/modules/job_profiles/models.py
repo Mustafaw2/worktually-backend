@@ -15,7 +15,7 @@ class JobProfile(models.Model):
         related_name="job_profile",
     )
     job_title = models.ForeignKey(
-        "job_seekers.JobTitle",
+        "lookups.JobTitle",
         on_delete=models.CASCADE,
         null=True,
         default=None,
@@ -31,6 +31,7 @@ class JobProfile(models.Model):
     )
 
     ssn_cnic_passport = models.CharField(max_length=45, null=True, default=None)
+    country = models.CharField(max_length=45, null=True, default=None)
     state = models.CharField(max_length=45, null=True, default=None)
     city = models.CharField(max_length=45, null=True, default=None)
     address = models.TextField(null=True, default=None)
