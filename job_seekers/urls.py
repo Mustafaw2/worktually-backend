@@ -12,4 +12,3 @@ urlpatterns = [
     path("api/education/", include("job_seekers.modules.education.urls")),
     path("api/language/", include("job_seekers.modules.languages.urls")),
 ]
-

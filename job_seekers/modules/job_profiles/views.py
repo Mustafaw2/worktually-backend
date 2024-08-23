@@ -13,13 +13,13 @@ from django.shortcuts import get_object_or_404
 from job_seekers.modules.job_profiles.serializers import (
     JobProfileSerializer,
     JobProfilePortfolioSerializer,
-    JobProfileInfoSerializer
+    JobProfileInfoSerializer,
 )
 
 
 class GetJobProfileInfo(generics.ListAPIView):
     authentication_classes = [JobSeekerJWTAuthentication]
-    serializer_class = JobProfileSerializer
+    serializer_class = JobProfileInfoSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = [IsAuthenticated]
 

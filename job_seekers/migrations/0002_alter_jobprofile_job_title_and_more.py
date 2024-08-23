@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("job_seekers", "0001_initial"),
         ("lookups", "0005_jobtitle"),

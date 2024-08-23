@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from job_seekers.models import JobTitle
 from lookups.models import Department
 
+
 class Command(BaseCommand):
     help = "Populates the JobTitle model with data from a JSON file"
 

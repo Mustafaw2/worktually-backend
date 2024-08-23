@@ -20,7 +20,6 @@ class EmployeeUserBackend(BaseBackend):
             return None
 
 
-
 class JobSeekerUserBackend(BaseBackend):
     def authenticate(self, request, email=None, password=None, **kwargs):
         try:

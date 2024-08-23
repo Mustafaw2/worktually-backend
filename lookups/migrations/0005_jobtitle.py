@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("lookups", "0004_alter_city_latitude_alter_city_longitude"),
     ]

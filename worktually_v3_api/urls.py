@@ -63,13 +63,11 @@ lookups_schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    
     # Include API paths for each app
     path("api/", include("employee.urls")),
     path("", include("recruitment.urls")),
     path("", include("job_seekers.urls")),
     path("lookups/", include("lookups.urls")),
-    
     # Swagger and ReDoc UIs for Employee
     re_path(
         r"^swagger/employee(?P<format>\.json|\.yaml)$",
@@ -86,7 +84,6 @@ urlpatterns = [
         employee_schema_view.with_ui("redoc", cache_timeout=0),
         name="schema-employee-redoc",
     ),
-    
     # Swagger and ReDoc UIs for Recruitment
     re_path(
         r"^swagger/recruitment(?P<format>\.json|\.yaml)$",
@@ -103,7 +100,6 @@ urlpatterns = [
         recruitment_schema_view.with_ui("redoc", cache_timeout=0),
         name="schema-recruitment-redoc",
     ),
-    
     # Swagger and ReDoc UIs for Job Seekers
     re_path(
         r"^swagger/jobseekers(?P<format>\.json|\.yaml)$",
@@ -120,7 +116,6 @@ urlpatterns = [
         job_seekers_schema_view.with_ui("redoc", cache_timeout=0),
         name="schema-jobseekers-redoc",
     ),
-    
     # Swagger and ReDoc UIs for Lookups
     re_path(
         r"^swagger/lookups(?P<format>\.json|\.yaml)$",

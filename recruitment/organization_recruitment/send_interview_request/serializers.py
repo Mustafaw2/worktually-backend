@@ -5,6 +5,7 @@ from recruitment.models import JobInterview
 from rest_framework import serializers
 from recruitment.models import JobInterview, Candidate, JobSeeker
 
+
 class SendInterviewRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobInterview
