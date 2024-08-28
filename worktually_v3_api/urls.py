@@ -16,7 +16,7 @@ employee_schema_view = get_schema_view(
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
-    patterns=[path("", include("employee.urls"))],
+    patterns=[path("api/", include("employee.urls"))],
 )
 
 recruitment_schema_view = get_schema_view(
