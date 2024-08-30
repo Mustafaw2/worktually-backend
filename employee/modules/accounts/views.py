@@ -22,6 +22,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from job_seekers.models import JobSeeker
 from job_seekers.modules.accounts.serializers import JobSeekerTokenObtainPairSerializer
+from django.shortcuts import get_object_or_404
 
 
 class RegisterView(APIView):
@@ -159,7 +160,7 @@ class VerifyOTPView(APIView):
     @swagger_auto_schema(
         request_body=VerifyOTPSerializer,
         responses={
-            200: "OTP verified successfully. A password reset link has been sent to your email.",
+            200: "Success",
             400: "Bad Request",
         },
     )
@@ -172,17 +173,11 @@ class VerifyOTPView(APIView):
             )
             otp_instance.is_verified = True
             otp_instance.save()
-            reset_link = f"{request.scheme}://{request.get_host()}/api/reset-password/?token={otp_instance.reset_token}"
-            send_mail(
-                "Reset Your Password",
-                f"Click the link to reset your password: {reset_link}",
-                settings.DEFAULT_FROM_EMAIL,
-                [otp_instance.email],
-                fail_silently=False,
-            )
             return Response(
                 {
-                    "message": "OTP verified successfully. A password reset link has been sent to your email."
+                    "message": "Success.",
+                    "email": otp_instance.email,
+                    "token": otp_instance.reset_token,
                 },
                 status=status.HTTP_200_OK,
             )
@@ -199,8 +194,28 @@ class ResetPasswordView(APIView):
     def post(self, request):
         serializer = ResetPasswordRequestSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(
-                {"message": "Password reset successfully."}, status=status.HTTP_200_OK
-            )
+            email = serializer.validated_data["email"]
+            token = serializer.validated_data["token"]
+            new_password = serializer.validated_data["new_password"]
+
+            otp_instance = OTP.objects.filter(
+                email=email, reset_token=token, is_verified=True
+            ).first()
+            if otp_instance:
+                user = get_object_or_404(Employee, email=email)
+                user.set_password(new_password)
+                user.save()
+                otp_instance.delete()
+                return Response(
+                    {"message": "Success"},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"message": "Invalid or expired token."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, *args, **kwargs):
+        return Response({"message": "Provide your new password and token."})
