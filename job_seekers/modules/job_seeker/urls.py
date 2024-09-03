@@ -18,5 +18,5 @@ urlpatterns = [
         DeleteBasicProfileView.as_view(),
         name="delete_profile",
     ),
-    path("list/<int:pk>/", JobSeekerDetailView.as_view(), name="job-seeker-detail"),
+    path("<int:pk>/", JobSeekerDetailView.as_view(), name="job-seeker-detail"),
 ]

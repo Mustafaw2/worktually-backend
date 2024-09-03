@@ -8,6 +8,8 @@ class JobProfile(models.Model):
         REJECTED = "rejected", _("Rejected")
         APPROVED = "approved", _("Approved")
 
+    job_profile_name = models.CharField(max_length=255, null=True, blank=True)
+
     job_seeker = models.ForeignKey(
         "job_seekers.JobSeeker",
         on_delete=models.CASCADE,
@@ -21,6 +23,7 @@ class JobProfile(models.Model):
         default=None,
         related_name="job_profiles",
     )
+    hourly_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     completion_rate = models.IntegerField(null=True, blank=True)
     priority = models.IntegerField(null=True, blank=True)
@@ -29,13 +32,7 @@ class JobProfile(models.Model):
         choices=Status.choices,
         default=Status.PENDING,
     )
-
-    ssn_cnic_passport = models.CharField(max_length=45, null=True, default=None)
-    country = models.CharField(max_length=45, null=True, default=None)
-    state = models.CharField(max_length=45, null=True, default=None)
-    city = models.CharField(max_length=45, null=True, default=None)
-    address = models.TextField(null=True, default=None)
-
+    
     reviewed_at = models.CharField(max_length=45)
     rating = models.CharField(max_length=45)
     is_approved = models.BooleanField(default=False)
