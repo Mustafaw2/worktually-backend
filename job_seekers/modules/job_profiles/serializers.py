@@ -14,7 +14,6 @@ class JobProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobProfile
         fields = fields = [
-            "job_profile_name",
             "job_seeker",
             "job_title",
             "hourly_rate"
@@ -41,7 +40,7 @@ class JobProfileInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobProfile
         fields = [
-            'id', 'status', 'job_profile_name', 'job_seeker', 'job_title',
+            'id', 'status', 'job_seeker', 'job_title',
             'hourly_rate', 'completion_rate', 'priority', 'reviewed_at',
             'rating', 'is_approved', 'education', 'experience', 'skills',
             'assessment', 'languages'
