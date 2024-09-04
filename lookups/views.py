@@ -42,7 +42,6 @@ class LookupBaseViewSet(viewsets.ModelViewSet):
 
     queryset = None  # To be overridden in subclasses
     serializer_class = None  # To be overridden in subclasses
-    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         if self.queryset is None:

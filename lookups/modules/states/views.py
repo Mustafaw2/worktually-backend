@@ -9,8 +9,6 @@ from drf_yasg import openapi
 
 
 class StateListView(APIView):
-    permission_classes = [IsAuthenticated]
-
     @swagger_auto_schema(
         operation_description="Get all states for a specific country by country ID",
         responses={

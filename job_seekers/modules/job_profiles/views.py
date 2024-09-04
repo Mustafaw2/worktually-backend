@@ -17,42 +17,6 @@ from job_seekers.modules.job_profiles.serializers import (
 )
 
 
-class GetJobProfileInfo(generics.ListAPIView):
-    authentication_classes = [JobSeekerJWTAuthentication]
-    serializer_class = JobProfileInfoSerializer
-    pagination_class = CustomPageNumberPagination
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        job_seeker = self.request.user
-        # Add logging to verify the job_seeker and queryset
-        if job_seeker:
-            queryset = JobProfile.objects.filter(job_seeker=job_seeker)
-            return queryset
-        return JobProfile.objects.none()
-
-    @swagger_auto_schema(
-        operation_description="Get the completion rates of job profiles with pagination",
-        responses={200: JobProfileInfoSerializer(many=True)},
-        manual_parameters=[
-            openapi.Parameter(
-                "page",
-                openapi.IN_QUERY,
-                description="Page number",
-                type=openapi.TYPE_INTEGER,
-            ),
-            openapi.Parameter(
-                "page_size",
-                openapi.IN_QUERY,
-                description="Number of items per page",
-                type=openapi.TYPE_INTEGER,
-            ),
-        ],
-    )
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-
 class JobProfileDetailView(APIView):
     authentication_classes = [JobSeekerJWTAuthentication]
 
@@ -278,3 +242,18 @@ class DeleteJobProfilePortfolioView(generics.DestroyAPIView):
             {"status": "success", "message": "Portfolio deleted successfully."},
             status=status.HTTP_204_NO_CONTENT,
         )
+
+
+
+class GetProfileInfo(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
+    serializer_class = JobProfileInfoSerializer
+    pagination_class = CustomPageNumberPagination
+    permission_classes = [IsAuthenticated]
+    def get(self, request, profile_id):
+        try:
+            job_profile = JobProfile.objects.get(id=profile_id)
+            serializer = JobProfileInfoSerializer(job_profile)
+            return Response({"status": "success", "data": [serializer.data]}, status=status.HTTP_200_OK)
+        except JobProfile.DoesNotExist:
+            return Response({"status": "error", "message": "JobProfile not found"}, status=status.HTTP_404_NOT_FOUND)

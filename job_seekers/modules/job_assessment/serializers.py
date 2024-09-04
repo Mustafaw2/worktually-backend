@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import JobTitle, JobTitleAssessment
+from .models import JobTitle, JobTitleAssessment, JobProfileAssessment
 
 
 class JobTitleAssessmentSerializer(serializers.ModelSerializer):
@@ -23,14 +23,7 @@ class AssessmentResultRequestSerializer(serializers.Serializer):
     submission = serializers.ListField(child=SubmissionSerializer())
 
 
-class AssessmentResultResponseSerializer(serializers.Serializer):
-    employee_job_profile_id = serializers.IntegerField()
-    obtained_marks = serializers.IntegerField()
-    total_marks = serializers.IntegerField()
-    status = serializers.CharField()
-    created_at = serializers.DateTimeField()
-    updated_at = serializers.DateTimeField()
-    message = serializers.CharField()
+
 
 
 class TestResultSerializer(serializers.Serializer):
@@ -40,10 +33,14 @@ class TestResultSerializer(serializers.Serializer):
 
 class GetResultsResponseSerializer(serializers.Serializer):
     job_profile_id = serializers.IntegerField()
-    test_result = serializers.ListField(child=TestResultSerializer())
     obtained_marks = serializers.IntegerField()
     total_marks = serializers.IntegerField()
     status = serializers.CharField()
     created_at = serializers.DateTimeField()
     updated_at = serializers.DateTimeField()
-    message = serializers.CharField()
+    class Meta:
+        model = JobProfileAssessment
+        fields = [
+            'job_profile', 'data', 'created_at', 'updated_at', 
+            'obtained_marks', 'total_marks', 'status'
+        ]

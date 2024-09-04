@@ -67,7 +67,7 @@ urlpatterns = [
     path("api/", include("employee.urls")),
     path("", include("recruitment.urls")),
     path("", include("job_seekers.urls")),
-    path("lookups/", include("lookups.urls")),
+    path("", include("lookups.urls")),
     # Swagger and ReDoc UIs for Employee
     re_path(
         r"^swagger/employee(?P<format>\.json|\.yaml)$",

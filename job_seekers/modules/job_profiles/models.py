@@ -8,8 +8,6 @@ class JobProfile(models.Model):
         REJECTED = "rejected", _("Rejected")
         APPROVED = "approved", _("Approved")
 
-    job_profile_name = models.CharField(max_length=255, null=True, blank=True)
-
     job_seeker = models.ForeignKey(
         "job_seekers.JobSeeker",
         on_delete=models.CASCADE,

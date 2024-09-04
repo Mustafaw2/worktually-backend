@@ -10,7 +10,7 @@ from .serializers import (
     GetAssessmentQuestionsSerializer,
     JobTitleAssessmentSerializer,
     AssessmentResultRequestSerializer,
-    AssessmentResultResponseSerializer,
+    GetResultsResponseSerializer,
     GetResultsResponseSerializer,
 )
 from django.utils import timezone
@@ -230,14 +230,6 @@ class GetResultsView(APIView):
         examples={
             "application/json": {
                 "job_profile_id": 1796,
-                "test_result": [
-                    {"question_id": 1396, "answer": "Critical thinking skills"},
-                    {
-                        "question_id": 1395,
-                        "answer": "Flexibleaccommodating and willing to pitch in to help their colleagues",
-                    },
-                    # more results
-                ],
                 "obtained_marks": 22,
                 "total_marks": 26,
                 "status": "Pass",
@@ -267,23 +259,8 @@ class GetResultsView(APIView):
 
             response_data_list = []
             for job_profile_assessment in job_profile_assessments:
-                try:
-                    # Ensure data is in JSON string format
-                    if isinstance(job_profile_assessment.data, str):
-                        data = json.loads(job_profile_assessment.data)
-                    else:
-                        data = job_profile_assessment.data
-
-                    test_result = data.get("submission", [])
-                except json.JSONDecodeError:
-                    return Response(
-                        {"message": "Invalid data format in job profile assessment"},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    )
-
                 response_data = {
                     "job_profile_id": job_profile_id,
-                    "test_result": test_result,
                     "obtained_marks": job_profile_assessment.obtained_marks,
                     "total_marks": job_profile_assessment.total_marks,
                     "status": job_profile_assessment.status,

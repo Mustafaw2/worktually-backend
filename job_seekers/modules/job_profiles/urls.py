@@ -24,11 +24,7 @@ urlpatterns = [
         DeleteJobProfilePortfolioView.as_view(),
         name="delete_portfolio",
     ),
-    path(
-        "info/",
-        GetJobProfileInfo.as_view(),
-        name="get_completion_rate",
-    ),
+    path('info/<int:profile_id>/', GetProfileInfo.as_view(), name='profile-info'),
     path(
         "job_profiles/<int:pk>/",
         JobProfileDetailView.as_view(),

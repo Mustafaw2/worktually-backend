@@ -8,8 +8,6 @@ from .serializers import CitySerializer
 
 
 class CityView(APIView):
-    permission_classes = [IsAuthenticated]
-
     @swagger_auto_schema(
         operation_description="Get cities by state ID",
         responses={
