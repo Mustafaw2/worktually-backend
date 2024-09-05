@@ -4,7 +4,7 @@ from django.core.exceptions import PermissionDenied
 from .models import (
     JobSeeker,
     OTP,
-    Education,
+    # Education,
     Language,
     JobProfileExperience,
     ApprovalModel,
@@ -32,19 +32,19 @@ class JobSeekerAdmin(admin.ModelAdmin):
     get_profile_completion.short_description = "Profile Completion (%)"
 
 
-class EducationAdmin(admin.ModelAdmin):
-    list_display = ("job_seeker", "title", "education_type_id", "completion_date")
-    search_fields = ("job_seeker__email", "title")
+# class EducationAdmin(admin.ModelAdmin):
+#     list_display = ("job_seeker", "title", "education_type_id", "completion_date")
+#     search_fields = ("job_seeker__email", "title")
 
 
-class LanguageAdmin(admin.ModelAdmin):
-    list_display = ("job_seeker", "language_id", "level")
-    search_fields = ("job_seeker__email", "language_id")
+# class LanguageAdmin(admin.ModelAdmin):
+#     list_display = ("job_seeker", "language_id", "level")
+#     search_fields = ("job_seeker__email", "language_id")
 
 
-class ExperienceAdmin(admin.ModelAdmin):
-    list_display = ("job_seeker", "title", "company_name", "start_date", "end_date")
-    search_fields = ("job_seeker__email", "title")
+# class ExperienceAdmin(admin.ModelAdmin):
+#     list_display = ("job_seeker", "title", "company_name", "start_date", "end_date")
+#     search_fields = ("job_seeker__email", "title")
 
 
 class ApprovalModelAdmin(admin.ModelAdmin):
@@ -81,9 +81,9 @@ class ApprovalModelAdmin(admin.ModelAdmin):
 
 admin.site.register(JobSeeker, JobSeekerAdmin)
 admin.site.register(JobProfile)
-admin.site.register(Education, EducationAdmin)
-admin.site.register(Language, LanguageAdmin)
-admin.site.register(JobProfileExperience, ExperienceAdmin)
+# admin.site.register(Education, EducationAdmin)
+# admin.site.register(Language, LanguageAdmin)
+# admin.site.register(JobProfileExperience, ExperienceAdmin)
 admin.site.register(ApprovalModel, ApprovalModelAdmin)
 admin.site.register(Settings)
 admin.site.register(JobTitleAssessment)

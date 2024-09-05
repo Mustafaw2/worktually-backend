@@ -104,6 +104,17 @@ class DegreeType(models.Model):
         db_table = "lookup_degree_type"
         app_label = "lookups"
 
+class DegreeTitle(models.Model):
+    name = models.CharField(max_length=255)
+    active_status = models.BooleanField(default=True)
+    degree_type = models.ForeignKey(DegreeType, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Degree'
+        verbose_name_plural = 'Degrees'
 
 class EmployeeType(models.Model):
     name = models.CharField(max_length=100)

@@ -5,6 +5,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated
 from lookups.models import City
 from .serializers import CitySerializer
+from drf_yasg import openapi
 
 
 class CityView(APIView):
@@ -15,6 +16,15 @@ class CityView(APIView):
             400: "State ID is required",
             404: "State not found",
         },
+        manual_parameters=[
+            openapi.Parameter(
+                "state_id",
+                openapi.IN_QUERY,
+                description="state_id",
+                type=openapi.TYPE_INTEGER,
+                required=True,
+            )
+        ],
     )
     def get(self, request, *args, **kwargs):
         state_id = request.query_params.get("state_id", None)

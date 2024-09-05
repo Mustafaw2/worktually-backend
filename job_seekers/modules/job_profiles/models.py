@@ -1,5 +1,7 @@
+from datetime import timezone
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 
 class JobProfile(models.Model):
@@ -81,14 +83,15 @@ class JobProfilePortfolio(models.Model):
     job_profile = models.ForeignKey(
         JobProfile, on_delete=models.CASCADE, related_name="portfolios"
     )
-    title = models.CharField(max_length=45)
+    project_title = models.CharField(max_length=45)
     description = models.TextField()
-    tags = models.TextField()
     url = models.CharField(max_length=45)
-    files = models.TextField()
+    files = models.FileField(upload_to='portfolios/')
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         app_label = "job_seekers"
 
     def __str__(self):
-        return self.title
+        return self.project_title

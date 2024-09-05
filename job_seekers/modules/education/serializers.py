@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import Education
 
-
 class EducationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Education
@@ -9,8 +8,9 @@ class EducationSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "job_seeker",
-            "title",
-            "education_type_id",
-            "major_subjects",
+            "degree_type",
+            "discipline",
             "institute_name",
+            "from_date",
+            "to_date",
         ]

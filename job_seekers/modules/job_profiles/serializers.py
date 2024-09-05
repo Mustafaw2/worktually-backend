@@ -27,7 +27,9 @@ class JobProfileSerializer(serializers.ModelSerializer):
 class JobProfilePortfolioSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobProfilePortfolio
-        fields = "__all__"
+        fields = [
+            'id', 'job_profile', 'project_title', 'description', 'url',  'created_at', 'updated_at'
+        ]
 
 
 class JobProfileInfoSerializer(serializers.ModelSerializer):
