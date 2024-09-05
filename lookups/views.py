@@ -87,63 +87,76 @@ class LookupBaseViewSet(viewsets.ModelViewSet):
 class IndustryViewSet(LookupBaseViewSet):
     queryset = Industry.objects.all()
     serializer_class = IndustrySerializer
+    pagination_class = None
 
 
 class CountryViewSet(LookupBaseViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
+    pagination_class = None
 
 
 class StateViewSet(LookupBaseViewSet):
     queryset = State.objects.all()
     serializer_class = StateSerializer
+    pagination_class = None
 
 
 class CityViewSet(LookupBaseViewSet):
     queryset = City.objects.all()
     serializer_class = CitySerializer
+    pagination_class = None
 
 
 class DesignationViewSet(LookupBaseViewSet):
     queryset = Designation.objects.all()
     serializer_class = DesignationSerializer
+    pagination_class = None
 
 
 class DepartmentViewSet(LookupBaseViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
+    pagination_class = None
 
 
 class SourceViewSet(LookupBaseViewSet):
     queryset = Source.objects.all()
     serializer_class = SourceSerializer
+    pagination_class = None
 
 
 class DegreeTypeViewSet(LookupBaseViewSet):
     queryset = DegreeType.objects.all()
     serializer_class = DegreeTypeSerializer
+    pagination_class = None
 
 
 class EmployeeTypeViewSet(LookupBaseViewSet):
     queryset = EmployeeType.objects.all()
     serializer_class = EmployeeTypeSerializer
+    pagination_class = None
 
 
 class JobTypeViewSet(LookupBaseViewSet):
     queryset = JobType.objects.all()
     serializer_class = JobTypeSerializer
+    pagination_class = None
 
 
 class RelationViewSet(LookupBaseViewSet):
     queryset = Relation.objects.all()
     serializer_class = RelationSerializer
+    pagination_class = None
 
 
 class SkillViewSet(LookupBaseViewSet):
     queryset = Skills.objects.all()
     serializer_class = SkillsSerializer
+    pagination_class = None
 
 
 class LanguageViewSet(LookupBaseViewSet):
     queryset = Language.objects.all()
     serializer_class = LanguagesSerializer
+    pagination_class = None
