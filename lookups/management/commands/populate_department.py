@@ -1,24 +1,29 @@
 import os
 import json
 from django.core.management.base import BaseCommand
-from lookups.models import DegreeSubject
+from lookups.models import Source
 
 
 class Command(BaseCommand):
-    help = "Populates the Department model with data from a JSON file"
+    help = "Populates the Source model with data from a JSON file"
 
     def handle(self, *args, **kwargs):
         # Construct the file path
-        file_path = os.path.join("lookups", "fixtures", "degree_subjects.json")
+        file_path = os.path.join("lookups", "fixtures", "source.json")
 
         # Open and read the JSON file
         with open(file_path, "r") as f:
             data = json.load(f)
 
-        # Populate the Department model
+        # Populate the Source model
         for item in data:
-            DegreeSubject.objects.get_or_create(name=item["name"])
+            source, created = Source.objects.get_or_create(
+                name=item["name"],
+                defaults={"status": item["status"]}
+            )
+            if created:
+                self.stdout.write(self.style.SUCCESS(f"Added {source.name} to Source table."))
+            else:
+                self.stdout.write(f"{source.name} already exists.")
 
-        self.stdout.write(
-            self.style.SUCCESS("Successfully populated Department model.")
-        )
+        self.stdout.write(self.style.SUCCESS("Successfully populated Source model."))
