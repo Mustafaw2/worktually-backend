@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from job_seekers.modules.experience.models import JobProfileExperience
+from rest_framework import serializers
 
 class JobProfileExperienceSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobProfileExperience
         fields = [
-            "job_seeker",
             "company_name",
             "start_date",
             "end_date",
@@ -14,4 +14,12 @@ class JobProfileExperienceSerializer(serializers.ModelSerializer):
             "country",
             "city",
         ]
+
+    def create(self, validated_data):
+        validated_data['job_seeker'] = self.context['request'].user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data['job_seeker'] = self.context['request'].user
+        return super().update(instance, validated_data)
 

@@ -3,16 +3,8 @@ from .views import *
 
 urlpatterns = [
     path("add/", AddJobProfileView.as_view(), name="add_job_profile"),
-    path(
-        "update/<int:pk>/",
-        UpdateJobProfileView.as_view(),
-        name="update_job_profile",
-    ),
-    path(
-        "delete/<int:pk>/",
-        DeleteJobProfileView.as_view(),
-        name="delete_job_profile",
-    ),
+    path("update/<int:pk>/", UpdateJobProfileView.as_view(), name="update_job_profile"),
+    path("delete/<int:pk>/", DeleteJobProfileView.as_view(), name="delete_job_profile"),
     path("portfolio/add/", AddJobProfilePortfolioView.as_view(), name="add_portfolio"),
     path(
         "portfolio/update/<int:pk>/",

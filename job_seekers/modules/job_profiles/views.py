@@ -36,18 +36,25 @@ class JobProfileDetailView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
+from job_seekers.modules.job_profiles.models import JobProfile
+from job_seekers.modules.job_profiles.serializers import JobProfileSerializer
+from django.shortcuts import get_object_or_404
+
 class AddJobProfileView(generics.CreateAPIView):
     authentication_classes = [JobSeekerJWTAuthentication]
-    queryset = JobProfile.objects.all()
     serializer_class = JobProfileSerializer
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         request_body=JobProfileSerializer,
         responses={
-            201: openapi.Response(
-                "Job Profile added successfully.", JobProfileSerializer
-            ),
+            201: openapi.Response("Job Profile added successfully.", JobProfileSerializer),
             400: "Bad Request",
         },
         operation_description="Add a new job profile.",
@@ -62,54 +69,47 @@ class AddJobProfileView(generics.CreateAPIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        current_profile_count = JobProfile.objects.filter(
-            job_seeker=request.user
-        ).count()
+        current_profile_count = JobProfile.objects.filter(job_seeker=request.user).count()
 
         if current_profile_count >= profiles_limit:
             return Response(
-                {
-                    "status": "error",
-                    "message": "You have reached the maximum number of job profiles.",
-                },
+                {"status": "error", "message": "You have reached the maximum number of job profiles."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         try:
-            with transaction.atomic():
-                profile = serializer.save(job_seeker=request.user)
-                return Response(
-                    {"status": "success", "data": JobProfileSerializer(profile).data},
-                    status=status.HTTP_201_CREATED,
-                )
+            profile = serializer.save(job_seeker=request.user)
+            return Response(
+                {"status": "success", "data": JobProfileSerializer(profile).data},
+                status=status.HTTP_201_CREATED,
+            )
         except Exception as e:
             return Response(
                 {"status": "error", "message": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-
 class UpdateJobProfileView(generics.UpdateAPIView):
     authentication_classes = [JobSeekerJWTAuthentication]
-    queryset = JobProfile.objects.all()
     serializer_class = JobProfileSerializer
     permission_classes = [IsAuthenticated]
-    lookup_field = "pk"
-
     @swagger_auto_schema(
         request_body=JobProfileSerializer,
         responses={
-            200: openapi.Response(
-                "Job Profile updated successfully.", JobProfileSerializer
-            ),
+            200: openapi.Response("Job Profile updated successfully.", JobProfileSerializer),
             400: "Bad Request",
             404: "Not Found",
         },
         operation_description="Update an existing job profile.",
     )
+    def get_object(self):
+        # Retrieve the job profile for the logged-in user with the specified id
+        return get_object_or_404(
+            JobProfile, pk=self.kwargs["pk"], job_seeker=self.request.user
+        )
+    
     def put(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
@@ -124,15 +124,14 @@ class UpdateJobProfileView(generics.UpdateAPIView):
             {"status": "error", "errors": serializer.errors},
             status=status.HTTP_400_BAD_REQUEST,
         )
+    
 
+   
 
 class DeleteJobProfileView(generics.DestroyAPIView):
     authentication_classes = [JobSeekerJWTAuthentication]
-    queryset = JobProfile.objects.all()
     serializer_class = JobProfileSerializer
     permission_classes = [IsAuthenticated]
-    lookup_field = "pk"
-
     @swagger_auto_schema(
         responses={
             204: "Job Profile deleted successfully.",
@@ -141,6 +140,14 @@ class DeleteJobProfileView(generics.DestroyAPIView):
         },
         operation_description="Delete a job profile.",
     )
+
+    def get_object(self):
+        # Retrieve the job profile for the logged-in user with the specified id
+        return get_object_or_404(
+            JobProfile, pk=self.kwargs["pk"], job_seeker=self.request.user
+        )
+
+
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
@@ -148,6 +155,7 @@ class DeleteJobProfileView(generics.DestroyAPIView):
             {"status": "success", "message": "Job Profile deleted successfully."},
             status=status.HTTP_204_NO_CONTENT,
         )
+
 
 
 class AddJobProfilePortfolioView(generics.CreateAPIView):

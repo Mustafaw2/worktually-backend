@@ -7,10 +7,15 @@ class EducationSerializer(serializers.ModelSerializer):
         ref_name = "JobSeekerEducationSerializer"
         fields = [
             "id",
-            "job_seeker",
             "degree_type",
             "discipline",
             "institute_name",
             "from_date",
             "to_date",
         ]
+    
+    # Automatically set job_seeker during creation
+    def create(self, validated_data):
+        # Automatically assign the job_seeker from the context request
+        validated_data['job_seeker'] = self.context['request'].user
+        return super().create(validated_data)

@@ -14,7 +14,6 @@ class JobProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobProfile
         fields = fields = [
-            "job_seeker",
             "job_title",
             "hourly_rate"
         ]

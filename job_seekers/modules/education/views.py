@@ -7,6 +7,7 @@ from drf_yasg import openapi
 from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
 from .models import Education
 from .serializers import EducationSerializer
+from job_seekers.models import JobSeeker
 
 
 class AddEducationView(APIView):
@@ -22,16 +23,25 @@ class AddEducationView(APIView):
         operation_description="Add an education entry.",
         examples={
             "application/json": {
-                "job_seeker": 1,
                 "title": "Bachelor of Science",
-                "education_type_id": "BSc",
-                "major_subjects": "Computer Science",
+                "degree_type": "BSc",
+                "discipline": "Computer Science",
                 "institute_name": "University of Example",
+                "from_date": "2020-01-01",
+                "to_date": "2023-12-31"
             }
         },
     )
     def post(self, request):
-        serializer = EducationSerializer(data=request.data)
+        job_seeker_id = request.user.id  # Get the job_seeker_id from the token
+
+        # Merge the job_seeker_id into the request data
+        data = request.data.copy()
+        data['job_seeker'] = job_seeker_id
+
+        # Pass the request object in the context
+        serializer = EducationSerializer(data=data, context={'request': request})
+
         if serializer.is_valid():
             serializer.save()
             return Response(
@@ -39,6 +49,7 @@ class AddEducationView(APIView):
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class UpdateEducationView(APIView):
@@ -54,30 +65,32 @@ class UpdateEducationView(APIView):
             400: "Bad Request",
             404: "Not Found",
         },
-        operation_description="Update an education entry.",
+        operation_description="Update an education entry for the logged-in user.",
         examples={
             "application/json": {
-                "job_seeker": 1,
-                "title": "Bachelor of Science",
-                "education_type_id": "BSc",
-                "major_subjects": "Computer Science",
-                "score": "3.5 GPA",
-                "completion_date": "2020-05-15",
+                "degree_type": "BSc",
+                "discipline": "Computer Science",
                 "institute_name": "University of Example",
-                "certificate_photo": "path/to/certificate.jpg",
+                "from_date": "2020-01-01",
+                "to_date": "2023-12-31"
             }
         },
     )
-    def put(self, request, pk):
+    def put(self, request):
+        # Get the logged-in user's job_seeker_id
+        job_seeker_id = request.user.id
+        
         try:
-            education = Education.objects.get(pk=pk)
+            # Fetch the latest or specific education entry for the logged-in user
+            education = Education.objects.filter(job_seeker_id=job_seeker_id).latest('created_at')
         except Education.DoesNotExist:
             return Response(
-                {"status": "error", "message": "Education not found"},
+                {"status": "error", "message": "No education entry found for the logged-in user."},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        serializer = EducationSerializer(education, data=request.data, partial=True)
+        # Update the education entry with the new data
+        serializer = EducationSerializer(education, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(
@@ -87,25 +100,32 @@ class UpdateEducationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class DeleteEducationView(APIView):
     authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         responses={200: "Education deleted successfully.", 404: "Not Found"},
-        operation_description="Delete an education entry.",
+        operation_description="Delete the education entry for the logged-in user.",
     )
-    def delete(self, request, pk):
+    def delete(self, request):
+        # Get the logged-in user's job_seeker_id
+        job_seeker_id = request.user.id
+
         try:
-            education = Education.objects.get(pk=pk)
+            # Fetch the latest or specific education entry for the logged-in user
+            education = Education.objects.filter(job_seeker_id=job_seeker_id).latest('created_at')
         except Education.DoesNotExist:
             return Response(
-                {"status": "error", "message": "Education not found"},
+                {"status": "error", "message": "No education entry found for the logged-in user."},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        # Delete the education entry
         education.delete()
         return Response(
             {"status": "success", "message": "Education deleted successfully"},
             status=status.HTTP_200_OK,
         )
+

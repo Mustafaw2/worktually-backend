@@ -8,7 +8,6 @@ from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
 from .models import Language
 from .serializers import LanguageSerializer
 
-
 class AddLanguageView(APIView):
     authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -22,14 +21,15 @@ class AddLanguageView(APIView):
         operation_description="Add a language entry.",
         examples={
             "application/json": {
-                "job_seeker": 1,
-                "language_id": "English",
-                "level": "Advanced",
+                "language": "English",
+                "proficiency": "Advanced",
             }
         },
     )
     def post(self, request):
-        serializer = LanguageSerializer(data=request.data)
+        data = request.data.copy()
+        data['job_seeker'] = request.user.id  # Automatically set job_seeker to the logged-in user ID
+        serializer = LanguageSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(
@@ -37,7 +37,6 @@ class AddLanguageView(APIView):
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class UpdateLanguageView(APIView):
     authentication_classes = [JobSeekerJWTAuthentication]
@@ -53,16 +52,15 @@ class UpdateLanguageView(APIView):
         operation_description="Update a language entry.",
         examples={
             "application/json": {
-                "job_seeker": 1,
-                "language_id": "English",
-                "level": "Advanced",
+                "language": "English",
+                "proficiency": "Advanced",
             }
         },
     )
-    def put(self, request, pk):
-        try:
-            language = Language.objects.get(pk=pk)
-        except Language.DoesNotExist:
+    def put(self, request):
+        # Retrieve the language entry for the logged-in user
+        language = Language.objects.filter(job_seeker=request.user).first()
+        if not language:
             return Response(
                 {"status": "error", "message": "Language not found"},
                 status=status.HTTP_404_NOT_FOUND,
@@ -77,7 +75,6 @@ class UpdateLanguageView(APIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class DeleteLanguageView(APIView):
     authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -86,10 +83,10 @@ class DeleteLanguageView(APIView):
         responses={200: "Language deleted successfully.", 404: "Not Found"},
         operation_description="Delete a language entry.",
     )
-    def delete(self, request, pk):
-        try:
-            language = Language.objects.get(pk=pk)
-        except Language.DoesNotExist:
+    def delete(self, request):
+        # Retrieve the language entry for the logged-in user
+        language = Language.objects.filter(job_seeker=request.user).first()
+        if not language:
             return Response(
                 {"status": "error", "message": "Language not found"},
                 status=status.HTTP_404_NOT_FOUND,
