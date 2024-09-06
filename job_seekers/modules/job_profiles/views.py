@@ -258,10 +258,11 @@ class GetProfileInfo(APIView):
     serializer_class = JobProfileInfoSerializer
     pagination_class = CustomPageNumberPagination
     permission_classes = [IsAuthenticated]
-    def get(self, request, profile_id):
+    def get(self, request):
+        user = request.user
         try:
-            job_profile = JobProfile.objects.get(id=profile_id)
-            serializer = JobProfileInfoSerializer(job_profile)
-            return Response({"status": "success", "data": [serializer.data]}, status=status.HTTP_200_OK)
+            job_profiles = JobProfile.objects.filter(job_seeker=user)
+            serializer = JobProfileInfoSerializer(job_profiles, many=True)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
         except JobProfile.DoesNotExist:
-            return Response({"status": "error", "message": "JobProfile not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"status": "error", "message": "No JobProfiles found for the user"}, status=status.HTTP_404_NOT_FOUND)

@@ -25,8 +25,6 @@ class AddSkillsToJobProfileSerializer(serializers.Serializer):
 
 class JobProfileSkillSerializer(serializers.ModelSerializer):
     skill = SkillSerializer()
-    job_profile = serializers.PrimaryKeyRelatedField(queryset=JobProfile.objects.all())
-
     class Meta:
         model = JobProfileSkill
-        fields = ["skill", "job_profile"]
+        fields = ["skill"]
