@@ -8,6 +8,14 @@ from .models import JobSeeker
 from .serializers import BasicProfileSerializer
 from rest_framework import generics, status
 from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework_simplejwt.tokens import UntypedToken
+from rest_framework_simplejwt.exceptions import InvalidToken
+from django.contrib.auth.models import User
+from rest_framework.authentication import get_authorization_header
+from django.contrib.auth import logout
+from rest_framework_simplejwt.tokens import AccessToken
 
 
 class JobSeekerDetailView(generics.RetrieveAPIView):
@@ -142,3 +150,40 @@ class DeleteBasicProfileView(APIView):
             {"status": "success", "message": "Profile deleted successfully"},
             status=status.HTTP_200_OK,
         )
+
+
+class ValidateTokenView(APIView):
+    def post(self, request):
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return Response({"status": "error", "message": "Token not provided or incorrect format."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        token = auth_header.split(' ')[1]
+        
+        try:
+            # Decode the token using AccessToken to validate
+            decoded_token = AccessToken(token)
+            user_id = decoded_token.get("user_id")
+            
+            # Retrieve the user based on the decoded user_id
+            user = JobSeeker.objects.filter(pk=user_id).first()
+            
+            if not user:
+                raise InvalidToken("User not found.")
+            
+            # Prepare user data for response
+            user_data = {
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email,
+                "phone": user.phone,
+                "birth_date":user.birth_date,
+                "gender": user.gender,
+                "country": user.country,
+            }
+            
+            return Response({"status": "success", "message": "Token is valid.", "user": user_data}, status=status.HTTP_200_OK)
+        
+        except InvalidToken:
+            logout(request)  # Log out user if token is invalid
+            return Response({"status": "error", "message": "Invalid token. User logged out."}, status=status.HTTP_401_UNAUTHORIZED)

@@ -4,6 +4,7 @@ from .views import (
     UpdateBasicProfileView,
     DeleteBasicProfileView,
     JobSeekerDetailView,
+    ValidateTokenView
 )
 
 urlpatterns = [
@@ -19,4 +20,5 @@ urlpatterns = [
         name="delete_profile",
     ),
     path("<int:pk>/", JobSeekerDetailView.as_view(), name="job-seeker-detail"),
+    path('validate-token/', ValidateTokenView.as_view(), name='validate-token'),
 ]

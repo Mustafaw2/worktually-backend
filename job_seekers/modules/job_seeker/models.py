@@ -5,7 +5,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django.db import transaction
-
+from lookups.models import City, Country, State
 
 class JobSeekerManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password=None, **extra_fields):
@@ -48,7 +48,9 @@ class JobSeeker(AbstractBaseUser, PermissionsMixin):
     profile_picture = models.CharField(max_length=45, blank=True)
     cover_photo = models.CharField(max_length=45, blank=True)
     about = models.TextField(blank=True)
-    country = models.CharField(max_length=45, blank=True)
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True)
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
+    state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
