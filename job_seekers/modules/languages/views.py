@@ -27,13 +27,17 @@ class AddLanguageView(APIView):
         },
     )
     def post(self, request):
-        data = request.data.copy()
-        data['job_seeker'] = request.user.id  # Automatically set job_seeker to the logged-in user ID
-        serializer = LanguageSerializer(data=data)
+        # The job_seeker will be automatically set in the serializer
+        serializer = LanguageSerializer(data=request.data, context={'request': request})
+        
         if serializer.is_valid():
-            serializer.save()
+            language = serializer.save()
             return Response(
-                {"status": "success", "message": "Language added successfully"},
+                {
+                    "status": "success",
+                    "message": "Language added successfully",
+                    "data": LanguageSerializer(language).data  # Return the added language data
+                },
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -57,20 +61,26 @@ class UpdateLanguageView(APIView):
             }
         },
     )
-    def put(self, request):
-        # Retrieve the language entry for the logged-in user
-        language = Language.objects.filter(job_seeker=request.user).first()
-        if not language:
+    def put(self, request, language_id):
+        # Retrieve the specific language entry for the logged-in user
+        try:
+            language = Language.objects.get(id=language_id, job_seeker=request.user)
+        except Language.DoesNotExist:
             return Response(
-                {"status": "error", "message": "Language not found"},
+                {"status": "error", "message": "Language entry not found for the logged-in user."},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        serializer = LanguageSerializer(language, data=request.data, partial=True)
+        # Update the language entry with the new data
+        serializer = LanguageSerializer(language, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
+            updated_language = serializer.save()
             return Response(
-                {"status": "success", "message": "Language updated successfully"},
+                {
+                    "status": "success",
+                    "message": "Language updated successfully",
+                    "data": LanguageSerializer(updated_language).data  # Return the updated language data
+                },
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -83,17 +93,26 @@ class DeleteLanguageView(APIView):
         responses={200: "Language deleted successfully.", 404: "Not Found"},
         operation_description="Delete a language entry.",
     )
-    def delete(self, request):
-        # Retrieve the language entry for the logged-in user
-        language = Language.objects.filter(job_seeker=request.user).first()
-        if not language:
+    def delete(self, request, language_id):
+        # Retrieve the specific language entry for the logged-in user
+        try:
+            language = Language.objects.get(id=language_id, job_seeker=request.user)
+        except Language.DoesNotExist:
             return Response(
-                {"status": "error", "message": "Language not found"},
+                {"status": "error", "message": "Language entry not found for the logged-in user."},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        # Serialize the language entry data before deletion
+        language_data = LanguageSerializer(language).data
+        
+        # Delete the language entry
         language.delete()
         return Response(
-            {"status": "success", "message": "Language deleted successfully"},
+            {
+                "status": "success",
+                "message": "Language deleted successfully.",
+                "data": language_data  # Return the deleted language data
+            },
             status=status.HTTP_200_OK,
         )

@@ -11,6 +11,7 @@ from .views import (
     RelationViewSet,
     SkillViewSet,
     LanguageViewSet,
+    JobtitleViewSet
 )
 
 router = DefaultRouter()
@@ -24,6 +25,7 @@ router.register(r"job-types", JobTypeViewSet)
 router.register(r"relations", RelationViewSet)
 router.register(r"skills", SkillViewSet)
 router.register(r"languages", LanguageViewSet)
+router.register(r"jobtitles", JobtitleViewSet)
 
 urlpatterns = [
     path("api/", include(router.urls)),

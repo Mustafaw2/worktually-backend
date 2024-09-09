@@ -60,31 +60,33 @@ class UpdateExperienceView(generics.UpdateAPIView):
         },
         operation_description="Update an existing job profile experience.",
     )
-    def get_object(self):
-        # Retrieve the experience for the logged-in user
-        return JobProfileExperience.objects.filter(job_seeker=self.request.user).first()
 
-    def put(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if instance is None:
+    def put(self, request, experience_id):
+        # Get the logged-in user's job_seeker_id
+        job_seeker_id = request.user.id
+        
+        try:
+            # Fetch the specific experience entry for the logged-in user
+            experience = JobProfileExperience.objects.get(id=experience_id, job_seeker_id=job_seeker_id)
+        except JobProfileExperience.DoesNotExist:
             return Response(
-                {"status": "error", "message": "Experience not found for the logged-in user"},
+                {"status": "error", "message": "Experience not found for the logged-in user."},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        serializer = self.get_serializer(instance, data=request.data, partial=True, context={"request": request})
+
+        # Update the experience entry with the new data
+        serializer = JobProfileExperienceSerializer(experience, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             experience = serializer.save()
             return Response(
                 {
                     "status": "success",
-                    "data": JobProfileExperienceSerializer(experience).data,
+                    "message": "Experience updated successfully.",
+                    "data": JobProfileExperienceSerializer(experience).data  
                 },
                 status=status.HTTP_200_OK,
             )
-        return Response(
-            {"status": "error", "errors": serializer.errors},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DeleteExperienceView(generics.DestroyAPIView):
@@ -102,17 +104,30 @@ class DeleteExperienceView(generics.DestroyAPIView):
         },
         operation_description="Delete a job profile experience.",
     )
-    def get_object(self):
-        # Retrieve the experience for the logged-in user
-        instance = self.queryset.filter(job_seeker=self.request.user).first()
-        if instance is None:
-            raise Http404("Experience not found for the logged-in user")
-        return instance
 
-    def delete(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
+    def delete(self, request, experience_id):
+        # Get the logged-in user's job_seeker_id
+        job_seeker_id = request.user.id
+
+        try:
+            # Fetch the specific experience entry for the logged-in user
+            experience = JobProfileExperience.objects.get(id=experience_id, job_seeker_id=job_seeker_id)
+        except JobProfileExperience.DoesNotExist:
+            return Response(
+                {"status": "error", "message": "Experience not found for the logged-in user."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Serialize the experience data before deletion
+        response_data = JobProfileExperienceSerializer(experience).data
+
+        # Delete the experience entry
+        experience.delete()
         return Response(
-            {"status": "success", "message": "Experience deleted successfully."},
-            status=status.HTTP_204_NO_CONTENT,
+            {
+                "status": "success",
+                "message": "Experience deleted successfully.",
+                "data": response_data  # Include deleted data in the response
+            },
+            status=status.HTTP_200_OK,
         )

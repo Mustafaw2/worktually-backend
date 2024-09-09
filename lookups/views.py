@@ -16,6 +16,7 @@ from .models import (
     Relation,
     Skills,
     Language,
+    JobTitle
 )
 from .serializers import (
     IndustrySerializer,
@@ -31,6 +32,7 @@ from .serializers import (
     RelationSerializer,
     SkillsSerializer,
     LanguagesSerializer,
+    JobTitleSerializer
 )
 from rest_framework.permissions import IsAuthenticated
 
@@ -101,6 +103,10 @@ class StateViewSet(LookupBaseViewSet):
     serializer_class = StateSerializer
     pagination_class = None
 
+class JobtitleViewSet(LookupBaseViewSet):
+    queryset = JobTitle.objects.all()
+    serializer_class = JobTitleSerializer
+    pagination_class = None
 
 class CityViewSet(LookupBaseViewSet):
     queryset = City.objects.all()

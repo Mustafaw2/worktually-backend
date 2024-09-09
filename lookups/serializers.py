@@ -13,7 +13,15 @@ from .models import (
     Relation,
     Skills,
     Language,
+    JobTitle
 )
+
+
+
+class JobTitleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobTitle
+        fields = "__all__"
 
 
 class IndustrySerializer(serializers.ModelSerializer):

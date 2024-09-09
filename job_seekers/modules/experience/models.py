@@ -8,6 +8,11 @@ class JobProfileExperience(models.Model):
         on_delete=models.CASCADE,
         related_name="jobprofile_experiences",
     )
+    job_profile = models.ForeignKey(
+        "job_seekers.JobProfile", 
+        on_delete=models.CASCADE,
+        related_name="experiences"
+    )
     company_name = models.CharField(max_length=45)
     start_date = models.DateField()
     currently_working = models.BooleanField(default=False)
@@ -27,3 +32,4 @@ class JobProfileExperience(models.Model):
 
     def __str__(self):
         return f"{self.company_name} - {self.job_seeker}"
+

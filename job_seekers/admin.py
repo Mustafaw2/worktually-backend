@@ -1,35 +1,35 @@
-from django.contrib import admin
-from django import forms
-from django.core.exceptions import PermissionDenied
-from .models import (
-    JobSeeker,
-    OTP,
-    # Education,
-    Language,
-    JobProfileExperience,
-    ApprovalModel,
-    JobProfile,
-    Settings,
-    JobProfileAssessment,
-    JobTitleAssessment,
-    JobProfileInterview,
-    ScreeningInterviewTemplate,
-    JobProfileInterview,
-    JobTitleAssessment,
-)
-from django.contrib.auth import get_user_model
+# from django.contrib import admin
+# from django import forms
+# from django.core.exceptions import PermissionDenied
+# from .models import (
+#     JobSeeker,
+#     OTP,
+#     # Education,
+#     Language,
+#     JobProfileExperience,
+#     ApprovalModel,
+#     JobProfile,
+#     Settings,
+#     JobProfileAssessment,
+#     JobTitleAssessment,
+#     JobProfileInterview,
+#     ScreeningInterviewTemplate,
+#     JobProfileInterview,
+#     JobTitleAssessment,
+# )
+# from django.contrib.auth import get_user_model
 
-User = get_user_model()
+# User = get_user_model()
 
 
-class JobSeekerAdmin(admin.ModelAdmin):
-    list_display = ("email", "first_name", "last_name", "get_profile_completion")
-    search_fields = ("email", "first_name", "last_name")
+# class JobSeekerAdmin(admin.ModelAdmin):
+#     list_display = ("email", "first_name", "last_name", "get_profile_completion")
+#     search_fields = ("email", "first_name", "last_name")
 
-    def get_profile_completion(self, obj):
-        return obj.get_profile_completion()
+#     def get_profile_completion(self, obj):
+#         return obj.get_profile_completion()
 
-    get_profile_completion.short_description = "Profile Completion (%)"
+#     get_profile_completion.short_description = "Profile Completion (%)"
 
 
 # class EducationAdmin(admin.ModelAdmin):
@@ -47,9 +47,9 @@ class JobSeekerAdmin(admin.ModelAdmin):
 #     search_fields = ("job_seeker__email", "title")
 
 
-class ApprovalModelAdmin(admin.ModelAdmin):
-    list_display = ("job_seeker", "profile_completion_percentage", "is_approved")
-    search_fields = ("job_seeker__email",)
+# class ApprovalModelAdmin(admin.ModelAdmin):
+#     list_display = ("job_seeker", "profile_completion_percentage", "is_approved")
+#     search_fields = ("job_seeker__email",)
 
 
 # class ScreeningInterviewTemplateAdmin(admin.ModelAdmin):
@@ -79,15 +79,15 @@ class ApprovalModelAdmin(admin.ModelAdmin):
 #         return request.user.is_superuser
 
 
-admin.site.register(JobSeeker, JobSeekerAdmin)
-admin.site.register(JobProfile)
-# admin.site.register(Education, EducationAdmin)
-# admin.site.register(Language, LanguageAdmin)
-# admin.site.register(JobProfileExperience, ExperienceAdmin)
-admin.site.register(ApprovalModel, ApprovalModelAdmin)
-admin.site.register(Settings)
-admin.site.register(JobTitleAssessment)
-admin.site.register(JobProfileInterview)
-admin.site.register(JobProfileAssessment)
-admin.site.register(ScreeningInterviewTemplate)
-admin.site.register(OTP)
+# admin.site.register(JobSeeker, JobSeekerAdmin)
+# admin.site.register(JobProfile)
+# # admin.site.register(Education, EducationAdmin)
+# # admin.site.register(Language, LanguageAdmin)
+# # admin.site.register(JobProfileExperience, ExperienceAdmin)
+# admin.site.register(ApprovalModel, ApprovalModelAdmin)
+# admin.site.register(Settings)
+# admin.site.register(JobTitleAssessment)
+# admin.site.register(JobProfileInterview)
+# admin.site.register(JobProfileAssessment)
+# admin.site.register(ScreeningInterviewTemplate)
+# admin.site.register(OTP)

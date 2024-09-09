@@ -7,6 +7,8 @@ from job_seekers.modules.job_assessment.serializers import GetResultsResponseSer
 from job_seekers.modules.skills.serializers import JobProfileSkillSerializer
 from job_seekers.models import JobProfileSkill
 from .serializers import JobProfile
+from job_seekers.modules.job_seeker.serializers import BasicProfileSerializer
+from lookups.serializers import JobTitleSerializer
 
 
 class JobProfileSerializer(serializers.ModelSerializer):
@@ -21,16 +23,29 @@ class JobProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ["status"]
 
 
-
-
-
 class JobProfilePortfolioSerializer(serializers.ModelSerializer):
+    job_profile = serializers.PrimaryKeyRelatedField(
+        queryset=JobProfile.objects.all(),  
+        required=True
+    )
+
     class Meta:
         model = JobProfilePortfolio
         fields = [
-            'id', 'job_profile', 'project_title', 'description', 'url',  'created_at', 'updated_at'
+            'id', 
+            'job_profile', 
+            'project_title', 
+            'description', 
+            'url',  
+            'created_at', 
+            'updated_at'
         ]
 
+        def create(self, validated_data):
+            return super().create(validated_data)
+
+        def update(self, instance, validated_data):
+            return super().update(instance, validated_data)
 
 class JobProfileInfoSerializer(serializers.ModelSerializer):
     education = EducationSerializer(many=True, read_only=True, source='job_seeker.Education')
@@ -39,6 +54,8 @@ class JobProfileInfoSerializer(serializers.ModelSerializer):
     skills = JobProfileSkillSerializer(many=True, read_only=True, source='job_profile_skills')
     assessment = GetResultsResponseSerializer(many=True, source='assessments')
     languages = LanguageSerializer(many=True, source='job_seeker.language')
+    job_seeker = BasicProfileSerializer(read_only=True)
+    job_title = JobTitleSerializer(read_only=True)
 
     class Meta:
         model = JobProfile

@@ -43,9 +43,15 @@ class AddEducationView(APIView):
         serializer = EducationSerializer(data=data, context={'request': request})
 
         if serializer.is_valid():
-            serializer.save()
+            education = serializer.save()
+            response_data = EducationSerializer(education).data  # Serialize the saved object
+
             return Response(
-                {"status": "success", "message": "Education added successfully"},
+                {
+                    "status": "success",
+                    "message": "Education added successfully",
+                    "data": response_data,  # Include serialized data in response
+                },
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -65,7 +71,7 @@ class UpdateEducationView(APIView):
             400: "Bad Request",
             404: "Not Found",
         },
-        operation_description="Update an education entry for the logged-in user.",
+        operation_description="Update a specific education entry for the logged-in user.",
         examples={
             "application/json": {
                 "degree_type": "BSc",
@@ -76,29 +82,33 @@ class UpdateEducationView(APIView):
             }
         },
     )
-    def put(self, request):
+    def put(self, request, education_id):
         # Get the logged-in user's job_seeker_id
         job_seeker_id = request.user.id
         
         try:
-            # Fetch the latest or specific education entry for the logged-in user
-            education = Education.objects.filter(job_seeker_id=job_seeker_id).latest('created_at')
+            # Fetch the specific education entry for the logged-in user
+            education = Education.objects.get(id=education_id, job_seeker_id=job_seeker_id)
         except Education.DoesNotExist:
             return Response(
-                {"status": "error", "message": "No education entry found for the logged-in user."},
+                {"status": "error", "message": "Education entry not found for the logged-in user."},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         # Update the education entry with the new data
         serializer = EducationSerializer(education, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
+            education = serializer.save()
+            response_data = EducationSerializer(education).data  # Serialize the updated data
             return Response(
-                {"status": "success", "message": "Education updated successfully"},
+                {
+                    "status": "success",
+                    "message": "Education updated successfully",
+                    "data": response_data,  # Include updated data in the response
+                },
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class DeleteEducationView(APIView):
@@ -107,25 +117,33 @@ class DeleteEducationView(APIView):
 
     @swagger_auto_schema(
         responses={200: "Education deleted successfully.", 404: "Not Found"},
-        operation_description="Delete the education entry for the logged-in user.",
+        operation_description="Delete a specific education entry for the logged-in user.",
     )
-    def delete(self, request):
+    def delete(self, request, education_id):
         # Get the logged-in user's job_seeker_id
         job_seeker_id = request.user.id
 
         try:
-            # Fetch the latest or specific education entry for the logged-in user
-            education = Education.objects.filter(job_seeker_id=job_seeker_id).latest('created_at')
+            # Fetch the specific education entry for the logged-in user
+            education = Education.objects.get(id=education_id, job_seeker_id=job_seeker_id)
         except Education.DoesNotExist:
             return Response(
-                {"status": "error", "message": "No education entry found for the logged-in user."},
+                {"status": "error", "message": "Education entry not found for the logged-in user."},
                 status=status.HTTP_404_NOT_FOUND,
             )
+
+        # Serialize the education data before deletion
+        response_data = EducationSerializer(education).data
 
         # Delete the education entry
         education.delete()
         return Response(
-            {"status": "success", "message": "Education deleted successfully"},
+            {
+                "status": "success",
+                "message": "Education deleted successfully",
+                "data": response_data,  # Include deleted data in the response
+            },
             status=status.HTTP_200_OK,
         )
+
 
