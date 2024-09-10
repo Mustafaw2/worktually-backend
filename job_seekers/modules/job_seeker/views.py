@@ -179,7 +179,6 @@ class ValidateTokenView(APIView):
                 "phone": user.phone,
                 "birth_date":user.birth_date,
                 "gender": user.gender,
-                "country": user.country,
             }
             
             return Response({"status": "success", "message": "Token is valid.", "user": user_data}, status=status.HTTP_200_OK)
