@@ -22,4 +22,8 @@ class Language(models.Model):
         app_label = "job_seekers"
 
     def __str__(self):
-        return f"{self.language.name} ({self.proficiency})"
+        if self.language:  # Check if language is not None
+            return f"{self.language.name} ({self.proficiency})"
+        else:
+            return f"Unknown Language ({self.proficiency})"
+

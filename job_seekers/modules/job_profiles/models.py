@@ -2,6 +2,7 @@ from datetime import timezone
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from job_seekers.modules.job_seeker.models import ApprovalModel
 
 
 class JobProfile(models.Model):
@@ -10,12 +11,7 @@ class JobProfile(models.Model):
         REJECTED = "rejected", _("Rejected")
         APPROVED = "approved", _("Approved")
 
-    job_seeker = models.ForeignKey(
-        "job_seekers.JobSeeker",
-        on_delete=models.CASCADE,
-        null=True,
-        related_name="job_profile",
-    )
+    job_seeker = models.ForeignKey('job_seekers.JobSeeker', on_delete=models.CASCADE, related_name="job_profile")
     job_title = models.ForeignKey(
         "lookups.JobTitle",
         on_delete=models.CASCADE,
@@ -25,7 +21,7 @@ class JobProfile(models.Model):
     )
     hourly_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
-    completion_rate = models.IntegerField(null=True, blank=True)
+    completion_rate = models.FloatField(default=0)
     priority = models.IntegerField(null=True, blank=True)
     status = models.CharField(
         max_length=10,
@@ -42,18 +38,52 @@ class JobProfile(models.Model):
 
     def __str__(self):
         return f"Job Profile {self.id} - {self.job_title}"
+    
 
     def sync_completion_rate(self):
-        # Sync completion_rate from JobSeeker's profile_completion_percentage
-        if self.job_seeker:
-            self.completion_rate = int(
-                self.job_seeker.approval.profile_completion_percentage
-            )
-            self.save()
+        # Step 1: Fetch the base completion rate from the ApprovalModel
+        approval = ApprovalModel.objects.get(job_seeker=self.job_seeker)
+        base_completion_rate = approval.profile_completion_percentage
+        print(f"Base completion rate from ApprovalModel: {base_completion_rate}")
+
+        # Step 2: Calculate experience and skills points
+        experience_points = self.calculate_experience_points()
+        print(f"Experience points for JobProfile {self.id}: {experience_points}")
+
+        skills_points = self.calculate_skills_points()
+        print(f"Skills points for JobProfile {self.id}: {skills_points}")
+
+        portfolio_points = self.calculate_portfolio_points()
+        print(f"Portfolio points for JobProfile {self.id}: {portfolio_points}")
+
+        # Step 3: Add experience points (23%), skills points, and portfolio points to the base completion rate
+        updated_completion_rate = base_completion_rate + experience_points + skills_points + portfolio_points
+        print(f"Final completion rate for JobProfile {self.id}: {updated_completion_rate}")
+
+        # Step 4: Ensure the updated completion rate does not exceed 100%
+        self.completion_rate = min(updated_completion_rate, 100)
+        self.save()
+
+    def calculate_experience_points(self):
+        """Calculate experience points, which are 23% of the completion rate."""
+        experience_points = 23  # 23% for adding experience
+        return experience_points
+
+    def calculate_skills_points(self):
+        """Calculate skills points, which are 23% of the completion rate."""
+        # Add 23 points for having skills in this profile
+        skills_points = 23 if self.job_profile_skills.exists() else 0
+        return skills_points
+    
+
+    def calculate_portfolio_points(self):
+        """Calculate portfolio points, which are 23% of the completion rate."""
+        return 23 if self.portfolios.exists() else 0
+
 
     def sync_is_approved(self):
-        # Sync is_approved from JobSeeker's is_approved
-        if self.job_seeker:
+        """ Sync is_approved based on JobSeeker's approval status. """
+        if self.job_seeker and self.job_seeker.approval:
             self.is_approved = self.job_seeker.approval.is_approved
             self.save()
 
@@ -85,8 +115,8 @@ class JobProfilePortfolio(models.Model):
     )
     project_title = models.CharField(max_length=45)
     description = models.TextField()
-    url = models.CharField(max_length=45)
-    files = models.FileField(upload_to='portfolios/')
+    url = models.CharField(max_length=255)
+    image_url = models.URLField(max_length=200, blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
 

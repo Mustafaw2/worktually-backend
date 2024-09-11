@@ -14,11 +14,10 @@ urlpatterns = [
         DeleteSkillCategoryView.as_view(),
         name="delete_skill_category",
     ),
-    path("add/", AddSkillsToJobProfileView.as_view(), name="add_skill"),
     path("update/<int:pk>/", UpdateSkillView.as_view(), name="update_skill"),
     path("delete/<int:pk>/", DeleteSkillView.as_view(), name="delete_skill"),
     path(
-        "job_profile_skill/add/",
+        "job_profile_skills_add/",
         AddJobProfileSkillView.as_view(),
         name="add_job_profile_skill",
     ),

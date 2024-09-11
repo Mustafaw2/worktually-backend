@@ -7,6 +7,7 @@ from drf_yasg import openapi
 from job_seekers.modules.experience.models import JobProfileExperience
 from job_seekers.modules.experience.serializers import JobProfileExperienceSerializer
 from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
+from job_seekers.models import JobProfile
 
 
 class AddExperienceView(generics.CreateAPIView):
@@ -26,6 +27,25 @@ class AddExperienceView(generics.CreateAPIView):
         operation_description="Add a new job profile experience.",
     )
     def post(self, request, *args, **kwargs):
+        # Extract job_profile_id from the request data
+        job_profile_id = request.data.get('job_profile')
+        if not job_profile_id:
+            return Response(
+                {"status": "error", "message": "Job profile ID is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Check if the job profile exists
+        if not JobProfile.objects.filter(id=job_profile_id).exists():
+            return Response(
+                {"status": "error", "message": "Job profile not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Ensure the job profile is associated with the logged-in user (optional, depending on your business logic)
+        # You might need to adjust this check based on your specific requirements.
+
+        # Proceed with creating the experience
         serializer = self.get_serializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             experience = serializer.save()

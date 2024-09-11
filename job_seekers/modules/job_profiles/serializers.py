@@ -17,39 +17,33 @@ class JobProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobProfile
         fields = fields = [
+            "id",
             "job_title",
             "hourly_rate"
         ]
         read_only_fields = ["status"]
 
 
-class JobProfilePortfolioSerializer(serializers.ModelSerializer):
-    job_profile = serializers.PrimaryKeyRelatedField(
-        queryset=JobProfile.objects.all(),  
-        required=True
-    )
 
+class JobProfilePortfolioSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobProfilePortfolio
         fields = [
-            'id', 
-            'job_profile', 
-            'project_title', 
-            'description', 
-            'url',  
-            'created_at', 
-            'updated_at'
+            'id', 'job_profile', 'project_title', 'description', 'url',
+            'image_url', 'created_at', 'updated_at'
         ]
 
-        def create(self, validated_data):
-            return super().create(validated_data)
+    def validate_image_url(self, value):
+        # Ensure that the URL field is optional
+        if value and not isinstance(value, str):
+            raise serializers.ValidationError("Image URL must be a string.")
+        return value
 
-        def update(self, instance, validated_data):
-            return super().update(instance, validated_data)
+
 
 class JobProfileInfoSerializer(serializers.ModelSerializer):
     education = EducationSerializer(many=True, read_only=True, source='job_seeker.Education')
-    experience = JobProfileExperienceSerializer(many=True, read_only=True, source='job_seeker.jobprofile_experiences')
+    experience = JobProfileExperienceSerializer(many=True, read_only=True, source='jobprofile_experiences')
     portfolio = JobProfilePortfolioSerializer(many=True, read_only=True, source='portfolios')
     skills = JobProfileSkillSerializer(many=True, read_only=True, source='job_profile_skills')
     assessment = GetResultsResponseSerializer(many=True, source='assessments')

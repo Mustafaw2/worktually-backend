@@ -20,7 +20,6 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 class JobSeekerDetailView(generics.RetrieveAPIView):
     authentication_classes = [JobSeekerJWTAuthentication]
-    queryset = JobSeeker.objects.all()
     serializer_class = BasicProfileSerializer
     # permission_classes = [IsAuthenticated]
 
@@ -29,17 +28,11 @@ class JobSeekerDetailView(generics.RetrieveAPIView):
             200: openapi.Response("Success", BasicProfileSerializer),
             404: "Not Found",
         },
-        operation_description="Retrieve a job seeker's profile.",
+        operation_description="Retrieve the logged-in job seeker's profile.",
     )
-    def get(self, request, pk):
-        try:
-            profile = JobSeeker.objects.get(pk=pk)
-        except JobSeeker.DoesNotExist:
-            return Response(
-                {"status": "error", "message": "Profile not found"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
+    def get(self, request, *args, **kwargs):
+        # `request.user` is the logged-in user
+        profile = request.user
         serializer = self.get_serializer(profile)
         return Response(
             {"status": "success", "data": serializer.data},

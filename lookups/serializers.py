@@ -99,4 +99,4 @@ class SkillsSerializer(serializers.ModelSerializer):
 class LanguagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Language
-        fields = "__all__"
+        fields = ['id', 'name']

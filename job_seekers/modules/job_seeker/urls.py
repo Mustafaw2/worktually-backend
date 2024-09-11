@@ -19,6 +19,6 @@ urlpatterns = [
         DeleteBasicProfileView.as_view(),
         name="delete_profile",
     ),
-    path("<int:pk>/", JobSeekerDetailView.as_view(), name="job-seeker-detail"),
+    path("info/", JobSeekerDetailView.as_view(), name="job-seeker-detail"),
     path('validate-token/', ValidateTokenView.as_view(), name='validate-token'),
 ]

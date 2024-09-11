@@ -5,7 +5,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django.db import transaction
-from lookups.models import City, Country, State
+from lookups.models import City, Country, State, Source
 
 class JobSeekerManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password=None, **extra_fields):
@@ -19,34 +19,42 @@ class JobSeekerManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(
-        self, email, first_name, last_name, password=None, **extra_fields
-    ):
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", True)
-
-        if extra_fields.get("is_staff") is not True:
-            raise ValueError("Superuser must have is_staff=True.")
-        if extra_fields.get("is_superuser") is not True:
-            raise ValueError("Superuser must have is_superuser=True.")
-
-        return self.create_user(email, first_name, last_name, password, **extra_fields)
+    def create_superuser(self, email, first_name, last_name, password=None):
+        user = self.create_user(
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            password=password,
+        )
+        user.save(using=self._db)
+        return user
 
 
-class JobSeeker(AbstractBaseUser, PermissionsMixin):
+class JobSeeker(AbstractBaseUser):
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+    ]
+
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other'),
+    ]
+
     email = models.EmailField(unique=True, max_length=255)
     first_name = models.CharField(max_length=45)
     last_name = models.CharField(max_length=45)
     phone = models.CharField(max_length=45, blank=True)
     father_name = models.CharField(max_length=45, blank=True)
-    source_id = models.IntegerField(null=True, blank=True)
-    status = models.CharField(max_length=45, blank=True)
+    source = models.ForeignKey(Source, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=45, blank=True, choices=STATUS_CHOICES)
     birth_date = models.DateField(null=True, blank=True)
     id_number = models.CharField(max_length=45, blank=True)
     marital_status = models.CharField(max_length=45, blank=True)
-    gender = models.CharField(max_length=45, blank=True)
-    profile_picture = models.CharField(max_length=45, blank=True)
-    cover_photo = models.CharField(max_length=45, blank=True)
+    gender = models.CharField(max_length=45, blank=True, choices=GENDER_CHOICES)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    cover_photo = models.ImageField(upload_to='cover_photos/', blank=True, null=True)
     about = models.TextField(blank=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
@@ -65,25 +73,7 @@ class JobSeeker(AbstractBaseUser, PermissionsMixin):
         indexes = [
             models.Index(fields=["id"]),
         ]
-
-    class Meta:
         app_label = "job_seekers"
-
-    # Add related_name to avoid clashes with default User model
-    groups = models.ManyToManyField(
-        "auth.Group",
-        related_name="job_seeker_set",
-        blank=True,
-        help_text="The groups this user belongs to.",
-        related_query_name="job_seeker",
-    )
-    user_permissions = models.ManyToManyField(
-        "auth.Permission",
-        related_name="job_seeker_set",
-        blank=True,
-        help_text="Specific permissions for this user.",
-        related_query_name="job_seeker",
-    )
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
@@ -116,25 +106,14 @@ class JobSeeker(AbstractBaseUser, PermissionsMixin):
         languages_points = 1 if self.language.exists() else 0
         print(f"Languages points: {languages_points}")
 
-        # Calculate experience points
-        experience_points = 1 if self.jobprofile_experiences.exists() else 0
-        print(f"Experience points: {experience_points}")
 
-        # Calculate skills score points
-        skills_score_points = self.calculate_skills_score()
-        print(f"Skills score points: {skills_score_points}")
-
-        # Calculate total points and profile completion percentage
         total_points = (
-            profile_picture_points
+            + profile_picture_points
             + education_points
             + languages_points
-            + experience_points
-            + skills_score_points
+           
         )
         profile_completion_percentage = (total_points / 4.25) * 100
-        print(f"Profile completion percentage: {profile_completion_percentage}")
-
         # Update or create ApprovalModel instance
         with transaction.atomic():
             approval, created = ApprovalModel.objects.get_or_create(job_seeker=self)
@@ -142,24 +121,11 @@ class JobSeeker(AbstractBaseUser, PermissionsMixin):
             approval.update_approval_status()
             approval.save()
 
-        # Update associated job profiles
-        for profile in self.job_profile.all():
-            profile.sync_completion_rate()
-            profile.sync_is_approved()
-
-    def calculate_skills_score(self):
-        job_profiles = self.job_profile.all()
-        total_skills = sum(
-            profile.job_profile_skills.count() for profile in job_profiles
-        )
-        print(f"Total skills: {total_skills}")
-        return 1 if total_skills > 0 else 0
+    
 
 
 class ApprovalModel(models.Model):
-    job_seeker = models.OneToOneField(
-        JobSeeker, on_delete=models.CASCADE, related_name="approval"
-    )
+    job_seeker = models.OneToOneField('job_seekers.JobSeeker', on_delete=models.CASCADE, related_name="approval")
     profile_completion_percentage = models.FloatField(default=0)
     is_approved = models.BooleanField(default=False)
 

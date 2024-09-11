@@ -9,6 +9,7 @@ from job_seekers.models import (
     Language,
     JobProfileExperience,
     Skills,
+    JobProfilePortfolio,
     JobProfileSkill,
 )
 
@@ -25,20 +26,26 @@ def update_profile_completion_on_language_save(sender, instance, **kwargs):
     instance.job_seeker.update_profile_completion()
 
 
+
 @receiver(post_save, sender=JobProfileExperience)
 def update_profile_completion_on_experience_save(sender, instance, **kwargs):
     print("Experience updated, updating profile completion")
-    instance.job_seeker.update_profile_completion()
+    # Update completion rate only for the specific job profile associated with the experience
+    instance.job_profile.sync_completion_rate()
+
+
 
 
 @receiver(post_save, sender=JobProfileSkill)
-def update_profile_completion_on_jobprofileskills_save(sender, instance, **kwargs):
-    print(
-        f"JobProfileSkill updated, updating profile completion for JobProfile {instance.job_profile.id}"
-    )
-    job_seeker = instance.job_profile.job_seeker
-    job_seeker.update_profile_completion()
-    approval_instance = job_seeker.approval
+def update_profile_completion_on_skill_save(sender, instance, **kwargs):
+    print("JobProfileSkill updated, updating profile completion")
+    # Update completion rate only for the specific job profile associated with the skill
+    instance.job_profile.sync_completion_rate()
+
+@receiver(post_save, sender=JobProfilePortfolio)
+def update_job_profile_completion_rate(sender, instance, **kwargs):
+    # Ensure that the completion rate is updated when a portfolio is added or updated
+    instance.job_profile.sync_completion_rate()
 
 
 @receiver(post_save, sender=JobApplication)
