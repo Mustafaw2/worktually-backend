@@ -5,7 +5,9 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django.db import transaction
+import pytz
 from lookups.models import City, Country, State, Source
+from django.utils import timezone
 
 class JobSeekerManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password=None, **extra_fields):
@@ -60,6 +62,16 @@ class JobSeeker(AbstractBaseUser):
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
     state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True, blank=True)
 
+    created_at = models.DateTimeField(default=timezone.now)  
+    updated_at = models.DateTimeField(auto_now=True)
+    timezone = models.CharField(
+        max_length=50,
+        choices=[(tz, tz) for tz in pytz.all_timezones], 
+        default='UTC',
+        help_text="User's timezone"
+    )
+
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -74,6 +86,14 @@ class JobSeeker(AbstractBaseUser):
             models.Index(fields=["id"]),
         ]
         app_label = "job_seekers"
+
+    def get_current_time(self):
+        """
+        Get the current time in the user's timezone, or UTC if not set.
+        """
+        user_timezone = self.timezone if self.timezone else 'UTC'
+        tz = pytz.timezone(user_timezone)
+        return timezone.now().astimezone(tz)
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"

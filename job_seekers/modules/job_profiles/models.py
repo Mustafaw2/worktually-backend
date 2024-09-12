@@ -21,7 +21,7 @@ class JobProfile(models.Model):
     )
     hourly_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
-    completion_rate = models.FloatField(default=0)
+    completion_rate = models.IntegerField(default=0)
     priority = models.IntegerField(null=True, blank=True)
     status = models.CharField(
         max_length=10,
@@ -64,6 +64,14 @@ class JobProfile(models.Model):
         self.completion_rate = min(updated_completion_rate, 100)
         self.save()
 
+        self.completion_rate = updated_completion_rate
+        if updated_completion_rate >= 90:
+            self.status = self.STATUS_APPROVED
+        else:
+            self.status = self.STATUS_PENDING
+        
+        self.save()
+
     def calculate_experience_points(self):
         """Calculate experience points, which are 23% of the completion rate."""
         experience_points = 23  # 23% for adding experience
@@ -81,11 +89,6 @@ class JobProfile(models.Model):
         return 23 if self.portfolios.exists() else 0
 
 
-    def sync_is_approved(self):
-        """ Sync is_approved based on JobSeeker's approval status. """
-        if self.job_seeker and self.job_seeker.approval:
-            self.is_approved = self.job_seeker.approval.is_approved
-            self.save()
 
 
 class JobProfileReview(models.Model):

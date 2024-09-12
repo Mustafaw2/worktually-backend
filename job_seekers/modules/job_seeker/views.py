@@ -70,7 +70,7 @@ class AddBasicProfileView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(
-                {"status": "success", "message": "Profile added successfully"},
+                {"status": "success", "message": "Job Seeker added successfully"},
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -115,7 +115,7 @@ class UpdateBasicProfileView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(
-                {"status": "success", "message": "Profile updated successfully"},
+                {"status": "success", "message": "Job Seeker updated successfully"},
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -140,7 +140,7 @@ class DeleteBasicProfileView(APIView):
 
         profile.delete()
         return Response(
-            {"status": "success", "message": "Profile deleted successfully"},
+            {"status": "success", "message": "Job Seeker deleted successfully"},
             status=status.HTTP_200_OK,
         )
 

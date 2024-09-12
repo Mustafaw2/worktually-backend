@@ -182,7 +182,8 @@ class AddJobProfilePortfolioView(generics.CreateAPIView):
             portfolio.job_profile.sync_completion_rate()
             return Response(
                 {
-                    "status": "success",
+                    "status": "success", 
+                    "message": "Portfolio added successfully",
                     "data": JobProfilePortfolioSerializer(portfolio).data,
                 },
                 status=status.HTTP_201_CREATED,
@@ -219,6 +220,7 @@ class UpdateJobProfilePortfolioView(generics.UpdateAPIView):
             return Response(
                 {
                     "status": "success",
+                    "message": "Portfolio added successfully",
                     "data": JobProfilePortfolioSerializer(portfolio).data,
                 },
                 status=status.HTTP_200_OK,
