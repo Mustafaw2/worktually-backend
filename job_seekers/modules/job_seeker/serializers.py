@@ -12,6 +12,7 @@ class BasicProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobSeeker
         fields = [
+            "id",
             "profile_picture",
             "first_name",
             "last_name",
