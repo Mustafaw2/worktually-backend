@@ -25,5 +25,6 @@ class BasicProfileSerializer(serializers.ModelSerializer):
             "country",
             "city",
             "state",
+            "status",
         ]
 

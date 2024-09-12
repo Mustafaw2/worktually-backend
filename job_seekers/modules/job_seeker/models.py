@@ -33,15 +33,16 @@ class JobSeekerManager(BaseUserManager):
 
 
 class JobSeeker(AbstractBaseUser):
-    STATUS_CHOICES = [
-        ('active', 'Active'),
-        ('inactive', 'Inactive'),
-    ]
-
+   
     GENDER_CHOICES = [
         ('male', 'Male'),
         ('female', 'Female'),
         ('other', 'Other'),
+    ]
+
+    AVAILABILITY_CHOICES = [
+        ('available', 'Available'),
+        ('not_available', 'Not Available'),
     ]
 
     email = models.EmailField(unique=True, max_length=255)
@@ -50,7 +51,7 @@ class JobSeeker(AbstractBaseUser):
     phone = models.CharField(max_length=45, blank=True)
     father_name = models.CharField(max_length=45, blank=True)
     source = models.ForeignKey(Source, on_delete=models.SET_NULL, null=True, blank=True)
-    status = models.CharField(max_length=45, blank=True, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=45, blank=True, choices=AVAILABILITY_CHOICES)
     birth_date = models.DateField(null=True, blank=True)
     id_number = models.CharField(max_length=45, blank=True)
     marital_status = models.CharField(max_length=45, blank=True)
@@ -134,6 +135,7 @@ class JobSeeker(AbstractBaseUser):
            
         )
         profile_completion_percentage = (total_points / 4.25) * 100
+        print(profile_completion_percentage)
         # Update or create ApprovalModel instance
         with transaction.atomic():
             approval, created = ApprovalModel.objects.get_or_create(job_seeker=self)
