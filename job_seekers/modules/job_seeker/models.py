@@ -57,6 +57,7 @@ class JobSeeker(AbstractBaseUser):
     marital_status = models.CharField(max_length=45, blank=True)
     gender = models.CharField(max_length=45, blank=True, choices=GENDER_CHOICES)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    profile_picture_url = models.URLField(max_length=500, blank=True, null=True)
     cover_photo = models.ImageField(upload_to='cover_photos/', blank=True, null=True)
     about = models.TextField(blank=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True)
@@ -150,13 +151,6 @@ class ApprovalModel(models.Model):
     job_seeker = models.OneToOneField('job_seekers.JobSeeker', on_delete=models.CASCADE, related_name="approval")
     profile_completion_percentage = models.FloatField(default=0)
     is_approved = models.BooleanField(default=False)
-
-    def update_approval_status(self):
-        if self.profile_completion_percentage >= 90:
-            self.is_approved = True
-        else:
-            self.is_approved = False
-        self.save()
 
     class Meta:
         app_label = "job_seekers"

@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import JobSeeker
-from .serializers import BasicProfileSerializer
+from .serializers import BasicProfileSerializer, ProfilePictureSerializer
 from rest_framework import generics, status
 from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
 from django.utils.decorators import method_decorator
@@ -179,3 +179,113 @@ class ValidateTokenView(APIView):
         except InvalidToken:
             logout(request)  # Log out user if token is invalid
             return Response({"status": "error", "message": "Invalid token. User logged out."}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
+
+class AddProfilePictureView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        request_body=ProfilePictureSerializer,
+        responses={
+            201: openapi.Response(
+                "Profile picture added successfully.", ProfilePictureSerializer
+            ),
+            400: "Bad Request",
+        },
+        operation_description="Add a profile picture for the logged-in job seeker.",
+        examples={
+            "multipart/form-data": {
+                "profile_picture": "(File upload)",
+                "profile_picture_url": "https://example.com/profile.jpg"
+            }
+        }
+    )
+    def post(self, request):
+        user = request.user
+        serializer = ProfilePictureSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "status": "success",
+                    "message": "Profile picture added successfully.",
+                    "data": serializer.data, 
+                },
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+
+class UpdateProfilePictureView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        request_body=ProfilePictureSerializer,
+        responses={
+            200: openapi.Response(
+                "Profile picture updated successfully.",
+                ProfilePictureSerializer
+            ),
+            400: "Bad Request"
+        },
+        operation_description="Update the profile picture for the logged-in user.",
+        examples={
+            "application/json": {
+                "profile_picture_url": "https://example.com/path/to/updated_profile_picture.jpg"
+            }
+        }
+    )
+    def put(self, request):
+        user = request.user 
+        serializer = ProfilePictureSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "status": "success", "message": "Profile picture updated successfully", 
+                    "data": serializer.data,
+                },
+                status=status.HTTP_200_OK,
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteProfilePictureView(APIView):
+    authentication_classes = [JobSeekerJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        responses={
+            204: "Profile picture deleted successfully.",
+            400: "Bad Request"
+        },
+        operation_description="Delete the profile picture for the logged-in user and return the deleted profile picture URL."
+    )
+    def delete(self, request):
+        user = request.user  # Get the logged-in user
+        if user.profile_picture_url:
+            deleted_url = user.profile_picture_url  # Store the URL before deletion
+            user.profile_picture.delete(save=False)
+            user.profile_picture_url = None
+            user.save()
+
+            return Response(
+                {
+                    "status": "success",
+                    "message": "Profile picture deleted successfully",
+                    "deleted_profile_picture_url": deleted_url,
+                },
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        return Response(
+            {"status": "error", "message": "No profile picture found."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+
