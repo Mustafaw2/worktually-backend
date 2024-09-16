@@ -32,4 +32,5 @@ urlpatterns = [
     path("api/", include("lookups.modules.states.urls")),
     path("api/", include("lookups.modules.cities.urls")),
     path("api/", include("lookups.modules.countries.urls")),
+    path("api/", include("lookups.modules.skills.urls")),
 ]
