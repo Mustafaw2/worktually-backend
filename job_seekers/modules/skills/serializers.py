@@ -28,3 +28,18 @@ class JobProfileSkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobProfileSkill
         fields = ["skill"]
+
+
+
+
+class UpdateJobProfileSkillsSerializer(serializers.Serializer):
+    job_profile_id = serializers.IntegerField()
+    categoryId = serializers.IntegerField(required=False)  # Not strictly necessary unless used for filtering
+    skillIds = serializers.ListField(
+        child=serializers.IntegerField(), allow_empty=False
+    )
+
+    def validate_skillIds(self, value):
+        if not value:
+            raise serializers.ValidationError("At least one skill ID must be provided.")
+        return value

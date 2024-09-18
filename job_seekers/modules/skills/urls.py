@@ -14,21 +14,5 @@ urlpatterns = [
         DeleteSkillCategoryView.as_view(),
         name="delete_skill_category",
     ),
-    path("update/<int:pk>/", UpdateSkillView.as_view(), name="update_skill"),
-    path("delete/<int:pk>/", DeleteSkillView.as_view(), name="delete_skill"),
-    path(
-        "job_profile_skills_add/",
-        AddJobProfileSkillView.as_view(),
-        name="add_job_profile_skill",
-    ),
-    path(
-        "job_profile_skill/update/<int:pk>/",
-        UpdateJobProfileSkillView.as_view(),
-        name="update_job_profile_skill",
-    ),
-    path(
-        "job_profile_skill/delete/<int:pk>/",
-        DeleteJobProfileSkillView.as_view(),
-        name="delete_job_profile_skill",
-    ),
+    path('job_profile/update_skills/', UpdateJobProfileSkillsView.as_view(), name='update-job-profile-skills'),
 ]

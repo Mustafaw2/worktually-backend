@@ -8,6 +8,7 @@ from .serializers import SkillSerializer
 from job_seekers.modules.skills.models import Skills, JobProfileSkill
 from job_seekers.models import JobProfile
 from rest_framework import generics, status
+from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
@@ -17,9 +18,9 @@ from job_seekers.modules.skills.models import Skills
 from job_seekers.modules.skills.serializers import (
     SkillSerializer,
     SkillCategorySerializer,
-    AddSkillsToJobProfileSerializer,
-    JobProfileSkillSerializer,
+    UpdateJobProfileSkillsSerializer
 )
+from rest_framework.views import APIView
 from worktually_v3_api.custom_jwt.jwt import JobSeekerJWTAuthentication
 
 
@@ -117,243 +118,89 @@ class DeleteSkillCategoryView(generics.DestroyAPIView):
         )
 
 
-class AddSkillsToJobProfileView(generics.CreateAPIView):
+
+class UpdateJobProfileSkillsView(APIView):
     authentication_classes = [JobSeekerJWTAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = AddSkillsToJobProfileSerializer
 
     @swagger_auto_schema(
-        request_body=AddSkillsToJobProfileSerializer,
-        responses={
-            201: openapi.Response("Skills added successfully."),
-            400: "Bad Request",
-        },
-        operation_description="Add multiple skills to a job profile.",
-    )
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            job_profile_id = serializer.validated_data["job_profile_id"]
-            skill_ids = serializer.validated_data["skill_ids"]
-
-            # Check if job profile exists
-            try:
-                job_profile = JobProfile.objects.get(id=job_profile_id)
-            except JobProfile.DoesNotExist:
-                return Response(
-                    {"status": "error", "errors": "Job profile not found."},
-                    status=status.HTTP_404_NOT_FOUND,
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'job_profile_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='ID of the job profile'),
+                'categories': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'categoryId': openapi.Schema(type=openapi.TYPE_INTEGER, description='Category ID'),
+                            'skillIds': openapi.Schema(
+                                type=openapi.TYPE_ARRAY,
+                                items=openapi.Schema(type=openapi.TYPE_INTEGER),
+                                description='Array of skill IDs'
+                            )
+                        }
+                    )
                 )
-
-            # Add skills to the job profile
-            job_profile_skills = []
-            for skill_id in skill_ids:
-                try:
-                    skill = Skills.objects.get(id=skill_id)
-                    job_profile_skill = JobProfileSkill.objects.create(
-                        job_profile=job_profile, skill=skill
-                    )
-                    job_profile_skills.append(job_profile_skill)
-                except Skills.DoesNotExist:
-                    return Response(
-                        {
-                            "status": "error",
-                            "errors": f"Skill with id {skill_id} not found.",
-                        },
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-            return Response(
-                {
-                    "status": "success",
-                    "data": JobProfileSkillSerializer(
-                        job_profile_skills, many=True
-                    ).data,
-                },
-                status=status.HTTP_201_CREATED,
-            )
-        return Response(
-            {"status": "error", "errors": serializer.errors},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-
-class UpdateSkillView(generics.UpdateAPIView):
-    authentication_classes = [JobSeekerJWTAuthentication]
-    queryset = Skills.objects.all()
-    serializer_class = SkillSerializer
-    permission_classes = [IsAuthenticated]
-    lookup_field = "pk"
-
-    @swagger_auto_schema(
-        request_body=SkillSerializer,
-        responses={
-            200: openapi.Response("Skill updated successfully.", SkillSerializer),
-            400: "Bad Request",
-            404: "Not Found",
-        },
-        operation_description="Update an existing skill.",
-    )
-    def put(self, request, *args, **kwargs):
-        partial = kwargs.pop("partial", False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        if serializer.is_valid():
-            skill = serializer.save()
-            return Response(
-                {"status": "success", "data": SkillSerializer(skill).data},
-                status=status.HTTP_200_OK,
-            )
-        return Response(
-            {"status": "error", "errors": serializer.errors},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-
-class DeleteSkillView(generics.DestroyAPIView):
-    authentication_classes = [JobSeekerJWTAuthentication]
-    queryset = Skills.objects.all()
-    serializer_class = SkillSerializer
-    permission_classes = [IsAuthenticated]
-    lookup_field = "pk"
-
-    @swagger_auto_schema(
-        responses={
-            204: "Skill deleted successfully.",
-            400: "Bad Request",
-            404: "Not Found",
-        },
-        operation_description="Delete a skill.",
-    )
-    def delete(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(
-            {"status": "success", "message": "Skill deleted successfully."},
-            status=status.HTTP_204_NO_CONTENT,
-        )
-
-
-class AddJobProfileSkillView(generics.CreateAPIView):
-    authentication_classes = [JobSeekerJWTAuthentication]
-    queryset = JobProfileSkill.objects.all()
-    serializer_class = AddSkillsToJobProfileSerializer
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        request_body=AddSkillsToJobProfileSerializer,
-        responses={
-            201: openapi.Response(
-                "Job Profile Skill added successfully.", AddSkillsToJobProfileSerializer
-            ),
-            400: "Bad Request",
-        },
-        operation_description="Add a skill to a job profile.",
-    )
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            job_profile_id = serializer.validated_data["job_profile_id"]
-            skill_ids = serializer.validated_data["skill_ids"]
-
-            # Check if job profile exists
-            try:
-                job_profile = JobProfile.objects.get(id=job_profile_id)
-            except JobProfile.DoesNotExist:
-                return Response(
-                    {"status": "error", "errors": "Job profile not found."},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
-
-            # Add skills to the job profile
-            job_profile_skills = []
-            for skill_id in skill_ids:
-                try:
-                    skill = Skills.objects.get(id=skill_id)
-                    job_profile_skill = JobProfileSkill.objects.create(
-                        job_profile=job_profile, skill=skill
-                    )
-                    job_profile_skills.append(job_profile_skill)
-                except Skills.DoesNotExist:
-                    return Response(
-                        {
-                            "status": "error",
-                            "errors": f"Skill with id {skill_id} not found.",
-                        },
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-            return Response(
-                {
-                    "status": "success",
-                    "data": JobProfileSkillSerializer(
-                        job_profile_skills, many=True
-                    ).data,
-                },
-                status=status.HTTP_201_CREATED,
-            )
-        return Response(
-            {"status": "error", "errors": serializer.errors},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-
-class UpdateJobProfileSkillView(generics.UpdateAPIView):
-    authentication_classes = [JobSeekerJWTAuthentication]
-    queryset = JobProfileSkill.objects.all()
-    serializer_class = SkillSerializer
-    permission_classes = [IsAuthenticated]
-    lookup_field = "pk"
-
-    @swagger_auto_schema(
-        request_body=SkillSerializer,
+            }
+        ),
         responses={
             200: openapi.Response(
-                "Job Profile Skill updated successfully.", SkillSerializer
+                description="Job Profile Skills updated successfully",
+                examples={
+                    "application/json": {
+                        "message": "Job profile skills updated successfully."
+                    }
+                }
             ),
             400: "Bad Request",
-            404: "Not Found",
+            404: "Job profile or skills not found"
         },
-        operation_description="Update an existing job profile skill.",
+        operation_description="Update job profile skills based on the provided category and skill data."
     )
     def put(self, request, *args, **kwargs):
-        partial = kwargs.pop("partial", False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        if serializer.is_valid():
-            job_profile_skill = serializer.save()
-            return Response(
-                {
-                    "status": "success",
-                    "data": SkillSerializer(job_profile_skill).data,
-                },
-                status=status.HTTP_200_OK,
+        job_profile_id = request.data.get('job_profile_id')
+        if not job_profile_id:
+            return Response({"error": "Job profile ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            job_profile = JobProfile.objects.get(id=job_profile_id)
+        except JobProfile.DoesNotExist:
+            return Response({"error": "Job profile not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        categories = request.data.get('categories', [])
+        for category in categories:
+            category_id = category.get('categoryId')
+            skill_ids = category.get('skillIds', [])
+
+            existing_skills = JobProfileSkill.objects.filter(
+                job_profile=job_profile, skill__skill_category_id=category_id
             )
-        return Response(
-            {"status": "error", "errors": serializer.errors},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+            existing_skill_ids = set(existing_skills.values_list('skill_id', flat=True))
+
+            new_skill_ids = set(skill_ids)
+            skills_to_add = new_skill_ids - existing_skill_ids
+            for skill_id in skills_to_add:
+                try:
+                    skill = Skills.objects.get(id=skill_id)
+                    JobProfileSkill.objects.create(skill=skill, job_profile=job_profile)
+                except Skills.DoesNotExist:
+                    return Response({"error": "One or more skills not found."}, status=status.HTTP_404_NOT_FOUND)
+
+            skills_to_remove = existing_skill_ids - new_skill_ids
+            JobProfileSkill.objects.filter(
+                job_profile=job_profile, skill_id__in=skills_to_remove
+            ).delete()
+
+        return Response({"message": "Job profile skills updated successfully."}, status=status.HTTP_200_OK)
 
 
-class DeleteJobProfileSkillView(generics.DestroyAPIView):
-    authentication_classes = [JobSeekerJWTAuthentication]
-    queryset = JobProfileSkill.objects.all()
-    serializer_class = SkillSerializer
-    permission_classes = [IsAuthenticated]
-    lookup_field = "pk"
 
-    @swagger_auto_schema(
-        responses={
-            204: "Job Profile Skill deleted successfully.",
-            400: "Bad Request",
-            404: "Not Found",
-        },
-        operation_description="Delete a job profile skill.",
-    )
-    def delete(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(
-            {"status": "success", "message": "Job Profile Skill deleted successfully."},
-            status=status.HTTP_204_NO_CONTENT,
-        )
+
+
+
+
+
+
+
+
