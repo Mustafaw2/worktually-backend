@@ -145,6 +145,9 @@ class Relation(models.Model):
 
 class SkillCategory(models.Model):
     name = models.CharField(max_length=45)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(null=True, auto_now_add=True)
+    updated_at = models.DateTimeField(null=True, auto_now=True)
 
     def __str__(self):
         return self.name
@@ -158,6 +161,9 @@ class Skills(models.Model):
         SkillCategory, on_delete=models.CASCADE, related_name="skills"
     )
     name = models.CharField(max_length=45)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(null=True, auto_now_add=True)
+    updated_at = models.DateTimeField(null=True, auto_now=True)
 
     class Meta:
         app_label = "lookups"
@@ -182,129 +188,3 @@ class DegreeSubject(models.Model):
         return self.name
     
 
-class AccountingSkills(models.Model):
-    name = models.CharField(max_length=100)
-    category = models.ForeignKey(SkillCategory, on_delete=models.CASCADE, related_name="accounting_skills")
-
-    def __str__(self):
-        return self.names
-
-    class Meta:
-        app_label = "lookups"
-        indexes = [
-            models.Index(fields=["id"]),
-        ]
-
-
-class AdminSoftware(models.Model):
-    name = models.CharField(max_length=100)
-    category = models.ForeignKey(SkillCategory, on_delete=models.CASCADE, related_name="admin_software")
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        app_label = "lookups"
-        indexes = [
-            models.Index(fields=["id"]),
-        ]
-
-
-class AdvertisingTools(models.Model):
-    name = models.CharField(max_length=100)
-    category = models.ForeignKey(SkillCategory, on_delete=models.CASCADE, related_name="advertising_tools")
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        app_label = "lookups"
-        indexes = [
-            models.Index(fields=["id"]),
-        ]
-
-
-
-class CMS(models.Model):
-    name = models.CharField(max_length=100)
-    category = models.ForeignKey(SkillCategory, on_delete=models.CASCADE, related_name="cms")
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        app_label = "lookups"
-        indexes = [
-            models.Index(fields=["id"]),
-        ]
-
-
-class CommunicationSkills(models.Model):
-    name = models.CharField(max_length=100)
-    category = models.ForeignKey(SkillCategory, on_delete=models.CASCADE, related_name="communication_skills")
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        app_label = "lookups"
-        indexes = [
-            models.Index(fields=["id"]),
-        ]
-
-
-class Database(models.Model):
-    name = models.CharField(max_length=100)
-    category = models.ForeignKey(SkillCategory, on_delete=models.CASCADE, related_name="databases")
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        app_label = "lookups"
-        indexes = [
-            models.Index(fields=["id"]),
-        ]
-
-
-class Frameworks(models.Model):
-    name = models.CharField(max_length=100)
-    category = models.ForeignKey(SkillCategory, on_delete=models.CASCADE, related_name="frameworks")
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        app_label = "lookups"
-        indexes = [
-            models.Index(fields=["id"]),
-        ]
-
-
-    
-class ProgrammingLanguage(models.Model):
-    name = models.CharField(max_length=100)
-    category = models.ForeignKey(SkillCategory, on_delete=models.CASCADE, related_name="programming_languages")
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        app_label = "lookups"
-        indexes = [
-            models.Index(fields=["id"]),
-        ]
-
-
-class SoftSkills(models.Model):
-    name = models.CharField(max_length=100)
-    category = models.ForeignKey(SkillCategory, on_delete=models.CASCADE, related_name="soft_skills")
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        app_label = "lookups"
-        indexes = [
-            models.Index(fields=["id"]),
-        ]

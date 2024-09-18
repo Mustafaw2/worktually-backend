@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete, pre_delete
 from django.dispatch import receiver
 
 from recruitment.models import Candidate, JobApplication
@@ -14,6 +14,12 @@ from job_seekers.models import (
 )
 
 
+@receiver(post_save, sender=JobSeeker)
+def update_profile_completion_on_profile_picture_save(sender, instance, **kwargs):
+    if 'profile_picture_url' in instance.__dict__:
+        print("Profile picture URL updated, updating profile completion")
+        instance.update_profile_completion()
+
 @receiver(post_save, sender=Education)
 def update_profile_completion_on_education_save(sender, instance, **kwargs):
     print("Education updated, updating profile completion")
@@ -25,27 +31,52 @@ def update_profile_completion_on_language_save(sender, instance, **kwargs):
     print("Language updated, updating profile completion")
     instance.job_seeker.update_profile_completion()
 
-
-
+@receiver(pre_delete, sender=JobProfileExperience)
 @receiver(post_save, sender=JobProfileExperience)
-def update_profile_completion_on_experience_save(sender, instance, **kwargs):
-    print("Experience updated, updating profile completion")
-    # Update completion rate only for the specific job profile associated with the experience
-    instance.job_profile.sync_completion_rate()
+@receiver(post_delete, sender=JobProfileExperience)
+def update_profile_completion_on_experience_change(sender, instance, **kwargs):
+    print("Experience updated, updating JobProfile completion")
+    instance.job_profile.update_profile_completion()
 
+@receiver(pre_delete, sender=JobProfilePortfolio)
+@receiver(post_save, sender=JobProfilePortfolio)
+@receiver(post_delete, sender=JobProfilePortfolio)
+def update_profile_completion_on_portfolio_change(sender, instance, **kwargs):
+    print("Portfolio updated, updating JobProfile completion")
+    instance.job_profile.update_profile_completion()
 
 
 
 @receiver(post_save, sender=JobProfileSkill)
-def update_profile_completion_on_skill_save(sender, instance, **kwargs):
-    print("JobProfileSkill updated, updating profile completion")
-    # Update completion rate only for the specific job profile associated with the skill
-    instance.job_profile.sync_completion_rate()
+@receiver(post_delete, sender=JobProfileSkill)
+def update_profile_completion_on_skill_change(sender, instance, **kwargs):
+    print("Skill updated, updating JobProfile completion")
+    instance.job_profile.update_profile_completion()
 
-@receiver(post_save, sender=JobProfilePortfolio)
-def update_job_profile_completion_rate(sender, instance, **kwargs):
-    # Ensure that the completion rate is updated when a portfolio is added or updated
-    instance.job_profile.sync_completion_rate()
+
+
+# Signals for post_delete
+@receiver(pre_delete, sender=JobSeeker)
+def update_profile_completion_on_profile_picture_delete(sender, instance, **kwargs):
+    if instance.profile_picture_url:
+        instance.profile_picture_url = None
+        print("Profile picture URL deleted, updating profile completion")
+        instance.update_profile_completion()
+
+
+@receiver(post_delete, sender=Education)
+def update_profile_completion_on_education_delete(sender, instance, **kwargs):
+    print("Education deleted, updating profile completion")
+    instance.job_seeker.update_profile_completion()
+
+
+@receiver(post_delete, sender=Language)
+def update_profile_completion_on_language_delete(sender, instance, **kwargs):
+    print("Language deleted, updating profile completion")
+    instance.job_seeker.update_profile_completion()
+
+
+
 
 
 @receiver(post_save, sender=JobApplication)

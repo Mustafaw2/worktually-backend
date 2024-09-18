@@ -178,8 +178,6 @@ class AddJobProfilePortfolioView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             portfolio = serializer.save()
-            # Update the completion rate after saving
-            portfolio.job_profile.sync_completion_rate()
             return Response(
                 {
                     "status": "success", 

@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from job_seekers.modules.job_seeker.models import ApprovalModel
+from django.db import transaction
 
 
 class JobProfile(models.Model):
@@ -39,54 +40,51 @@ class JobProfile(models.Model):
     def __str__(self):
         return f"Job Profile {self.id} - {self.job_title}"
     
+    def update_profile_completion(self):
+        print(f"Updating profile completion for JobProfile {self.id}")
 
-    def sync_completion_rate(self):
-        # Step 1: Fetch the base completion rate from the ApprovalModel
-        approval = ApprovalModel.objects.get(job_seeker=self.job_seeker)
-        base_completion_rate = approval.profile_completion_percentage
-        print(f"Base completion rate from ApprovalModel: {base_completion_rate}")
+        # Calculate experience points (1 point equals 23%)
+        experience_points = 1 if self.jobprofile_experiences.exists() else 0
+        print(f"Experience points: {experience_points}")
 
-        # Step 2: Calculate experience and skills points
-        experience_points = self.calculate_experience_points()
-        print(f"Experience points for JobProfile {self.id}: {experience_points}")
+        # Calculate portfolio points (1 point equals 23%)
+        portfolio_points = 1 if self.portfolios.exists() else 0
+        print(f"Portfolio points: {portfolio_points}")
 
-        skills_points = self.calculate_skills_points()
-        print(f"Skills points for JobProfile {self.id}: {skills_points}")
+        # Calculate job profile skills points (1 point equals 23%)
+        skills_points = 1 if self.job_profile_skills.exists() else 0
+        print(f"Skills points: {skills_points}")
 
-        portfolio_points = self.calculate_portfolio_points()
-        print(f"Portfolio points for JobProfile {self.id}: {portfolio_points}")
+        # Fetch JobSeeker's completion rate from ApprovalModel
+        try:
+            approval = ApprovalModel.objects.get(job_seeker=self.job_seeker)
+            job_seeker_completion_percentage = approval.profile_completion_percentage
+            print(f"JobSeeker completion percentage: {job_seeker_completion_percentage}")
+        except ApprovalModel.DoesNotExist:
+            job_seeker_completion_percentage = 0  # Default to 0 if not found
+            print("ApprovalModel not found for JobSeeker, defaulting to 0%")
 
-        # Step 3: Add experience points (23%), skills points, and portfolio points to the base completion rate
-        updated_completion_rate = base_completion_rate + experience_points + skills_points + portfolio_points
-        print(f"Final completion rate for JobProfile {self.id}: {updated_completion_rate}")
+        # Convert JobSeeker completion percentage to points (23% equals 1 point)
+        job_seeker_completion_points = job_seeker_completion_percentage / 23
+        print(f"JobSeeker completion points: {job_seeker_completion_points}")
 
-        # Step 4: Ensure the updated completion rate does not exceed 100%
-        self.completion_rate = min(updated_completion_rate, 100)
-        self.save()
+        # Calculate total points
+        total_points = (
+            experience_points + portfolio_points + skills_points + job_seeker_completion_points
+        )
 
-        self.completion_rate = updated_completion_rate
-        if updated_completion_rate >= 90:
-            self.status = self.STATUS_APPROVED
+        # Calculate completion rate based on 4 total points
+        self.completion_rate = (total_points / 4) * 100
+        print(f"Total completion rate: {self.completion_rate}")
+
+        # Update status based on completion rate
+        if self.completion_rate >= 90:
+            self.status = JobProfile.Status.APPROVED
         else:
-            self.status = self.STATUS_PENDING
-        
+            self.status = JobProfile.Status.PENDING
+
         self.save()
 
-    def calculate_experience_points(self):
-        """Calculate experience points, which are 23% of the completion rate."""
-        experience_points = 23  # 23% for adding experience
-        return experience_points
-
-    def calculate_skills_points(self):
-        """Calculate skills points, which are 23% of the completion rate."""
-        # Add 23 points for having skills in this profile
-        skills_points = 23 if self.job_profile_skills.exists() else 0
-        return skills_points
-    
-
-    def calculate_portfolio_points(self):
-        """Calculate portfolio points, which are 23% of the completion rate."""
-        return 23 if self.portfolios.exists() else 0
 
 
 

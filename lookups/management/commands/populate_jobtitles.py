@@ -1,30 +1,28 @@
 import os
 import json
 from django.core.management.base import BaseCommand
-from lookups.models import DegreeTitle, DegreeType
+from lookups.models import SoftSkills, SkillCategory
 
 class Command(BaseCommand):
-    help = "Populates the Degree model with data from a JSON file"
+    help = "Populates the SoftSkills model with data from a JSON file"
 
     def handle(self, *args, **kwargs):
         # Construct the file path
-        file_path = os.path.join("lookups", "fixtures", "degree_titles.json")
+        file_path = os.path.join("lookups", "fixtures", "soft_skills.json")
 
         # Open and read the JSON file
         with open(file_path, "r") as f:
             data = json.load(f)
 
-        # Populate the Degree model
+        # Populate the SoftSkills model
         for item in data:
-            # Fetch the DegreeType instance
-            degree_type = DegreeType.objects.get(id=item["degree_type_id"])
+            # Fetch the SkillCategory instance
+            category = SkillCategory.objects.get(id=item["category_id"])
 
-            # Create or get the Degree instance
-            DegreeTitle.objects.get_or_create(
+            # Create or get the SoftSkills instance
+            SoftSkills.objects.get_or_create(
                 name=item["name"],
-                active_status=item["active_status"] == 1,  # Convert 1 to True and 0 to False
-                degree_type=degree_type
+                category=category
             )
 
-        self.stdout.write(self.style.SUCCESS("Successfully populated Degree model."))
-
+        self.stdout.write(self.style.SUCCESS("Successfully populated SoftSkills model."))

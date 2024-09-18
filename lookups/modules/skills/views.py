@@ -1,12 +1,10 @@
 from rest_framework import generics
 from lookups.models import SkillCategory
-from .serializers import SkillCategorySerializer
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.views import APIView
+from .serializers import SkillSerializer, SkillCategorySerializer
 
-class SkillCategoryListAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        skill_categories = SkillCategory.objects.all()
-        serializer = SkillCategorySerializer(skill_categories, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SkillCategoryListView(generics.ListAPIView):
+    queryset = SkillCategory.objects.all()
+    serializer_class = SkillCategorySerializer
+    pagination_class = None

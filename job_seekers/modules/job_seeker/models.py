@@ -116,9 +116,9 @@ class JobSeeker(AbstractBaseUser):
     def update_profile_completion(self):
         print(f"Updating profile completion for JobSeeker {self.id}")
 
-        # Calculate profile picture points
-        profile_picture_points = 0.25 if self.profile_picture else 0
-        print(f"Profile picture points: {profile_picture_points}")
+        # Calculate profile picture URL points
+        profile_picture_points = 1 if self.profile_picture_url else 0
+        print(f"Profile picture URL points: {profile_picture_points}")
 
         # Calculate education points
         education_points = 1 if self.Education.exists() else 0
@@ -141,7 +141,6 @@ class JobSeeker(AbstractBaseUser):
         with transaction.atomic():
             approval, created = ApprovalModel.objects.get_or_create(job_seeker=self)
             approval.profile_completion_percentage = profile_completion_percentage
-            approval.update_approval_status()
             approval.save()
 
     

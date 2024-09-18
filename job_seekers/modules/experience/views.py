@@ -82,15 +82,12 @@ class UpdateExperienceView(generics.UpdateAPIView):
     )
 
     def put(self, request, experience_id):
-        # Get the logged-in user's job_seeker_id
-        job_seeker_id = request.user.id
-        
         try:
             # Fetch the specific experience entry for the logged-in user
-            experience = JobProfileExperience.objects.get(id=experience_id, job_seeker_id=job_seeker_id)
+            experience = JobProfileExperience.objects.get(id=experience_id)
         except JobProfileExperience.DoesNotExist:
             return Response(
-                {"status": "error", "message": "Experience not found for the logged-in user."},
+                {"status": "error", "message": "Experience not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -126,15 +123,14 @@ class DeleteExperienceView(generics.DestroyAPIView):
     )
 
     def delete(self, request, experience_id):
-        # Get the logged-in user's job_seeker_id
-        job_seeker_id = request.user.id
+
 
         try:
             # Fetch the specific experience entry for the logged-in user
-            experience = JobProfileExperience.objects.get(id=experience_id, job_seeker_id=job_seeker_id)
+            experience = JobProfileExperience.objects.get(id=experience_id)
         except JobProfileExperience.DoesNotExist:
             return Response(
-                {"status": "error", "message": "Experience not found for the logged-in user."},
+                {"status": "error", "message": "Experience not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
