@@ -73,9 +73,11 @@ class JobProfile(models.Model):
             experience_points + portfolio_points + skills_points + job_seeker_completion_points
         )
 
-        # Calculate completion rate based on 4 total points
-        self.completion_rate = (total_points / 4) * 100
-        print(f"Total completion rate: {self.completion_rate}")
+         # Calculate completion rate based on 4 total points (100% max)
+        self.completion_rate = min((total_points / 4) * 100, 100)  # Ensure it doesn't exceed 100%
+        print(f"Final completion rate: {self.completion_rate}")
+
+
 
         # Update status based on completion rate
         if self.completion_rate >= 90:

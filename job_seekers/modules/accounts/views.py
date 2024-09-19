@@ -12,8 +12,6 @@ from drf_yasg import openapi
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import logout
 from .models import OTP
-from employee.modules.accounts.serializers import EmployeeTokenObtainPairSerializer
-from employee.models import Employee
 from .serializers import (
     ForgetPasswordSerializer,
     ResetPasswordRequestSerializer,
@@ -94,8 +92,8 @@ class LoginView(APIView):
             user = authenticate(request, email=email, password=password)
 
             if user is not None:
-                if isinstance(user, Employee):
-                    token_serializer = EmployeeTokenObtainPairSerializer
+                if isinstance(user, JobSeeker):
+                    token_serializer = JobSeekerTokenObtainPairSerializer
                 elif isinstance(user, JobSeeker):
                     token_serializer = JobSeekerTokenObtainPairSerializer
                 else:
@@ -183,22 +181,24 @@ class VerifyOTPView(APIView):
         },
     )
     def post(self, request):
+        # Create serializer instance and validate input
         serializer = VerifyOTPSerializer(data=request.data)
+        
+        # If the data is valid, process it
         if serializer.is_valid():
-            otp_instance = OTP.objects.get(
-                email=serializer.validated_data["email"],
-                otp=serializer.validated_data["otp"],
-            )
-            otp_instance.is_verified = True
-            otp_instance.save()
+            # Call the save method to verify OTP and generate reset token
+            otp_instance = serializer.save()
+
             return Response(
                 {
-                    "message": "Success.",
+                    "message": "OTP verified successfully.",
                     "email": otp_instance.email,
-                    "token": otp_instance.reset_token,
+                    "token": otp_instance.reset_token,  # Return the reset token for password reset
                 },
                 status=status.HTTP_200_OK,
             )
+        
+        # Return errors if validation fails
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -219,6 +219,7 @@ class ResetPasswordView(APIView):
             otp_instance = OTP.objects.filter(
                 email=email, reset_token=token, is_verified=True
             ).first()
+            print(otp_instance)
             if otp_instance:
                 user = get_object_or_404(JobSeeker, email=email)
                 user.set_password(new_password)
