@@ -87,6 +87,10 @@ class GetAssessmentQuestionsView(APIView):
                     job_profile_skill.skill.name
                     for job_profile_skill in job_profile_skills
                 ]
+
+                # Delete any previously saved questions for this job title to avoid duplicates
+                JobTitleAssessment.objects.filter(job_title=job_title).delete()
+
                 # Generate questions using Gemini API
                 questions = generate_assessment_questions(job_title.name, skills)
 
@@ -108,15 +112,15 @@ class GetAssessmentQuestionsView(APIView):
                         answer=question["correct_answer"],
                     )
 
-                # Retrieve the questions from the database
-                questions = JobTitleAssessment.objects.filter(job_title=job_title)
+                # Retrieve exactly 30 questions from the database
+                questions = JobTitleAssessment.objects.filter(job_title=job_title)[:30]
                 question_data = JobTitleAssessmentSerializer(questions, many=True).data
 
                 return Response(
                     {
                         "message": "success",
                         "data": {
-                            "assessment_time": "20 minutes",
+                            "screening_test_duration:": "1200000",
                             "questions": question_data,
                         },
                     },
@@ -128,6 +132,7 @@ class GetAssessmentQuestionsView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class AssessmentResultView(APIView):
