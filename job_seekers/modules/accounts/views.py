@@ -25,7 +25,6 @@ from django.shortcuts import get_object_or_404
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
-
     @swagger_auto_schema(
         request_body=JobSeekerSerializer,
         responses={
@@ -48,10 +47,11 @@ class RegisterView(APIView):
         serializer = JobSeekerSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-
             # Generate tokens for the registered user
             refresh = RefreshToken.for_user(user)
             access = refresh.access_token
+
+            user_data = JobSeekerSerializer(user).data
 
             return Response(
                 {
@@ -66,7 +66,6 @@ class RegisterView(APIView):
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
-
     @swagger_auto_schema(
         request_body=LoginSerializer,
         responses={
@@ -90,7 +89,6 @@ class LoginView(APIView):
             email = serializer.validated_data["email"]
             password = serializer.validated_data["password"]
             user = authenticate(request, email=email, password=password)
-
             if user is not None:
                 if isinstance(user, JobSeeker):
                     token_serializer = JobSeekerTokenObtainPairSerializer
@@ -120,9 +118,9 @@ class LoginView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
-
     @swagger_auto_schema(
         responses={
             200: openapi.Response(
@@ -145,7 +143,6 @@ class LogoutView(APIView):
 
 class ForgetPasswordView(APIView):
     permission_classes = [AllowAny]
-
     @swagger_auto_schema(
         request_body=ForgetPasswordSerializer,
         responses={200: "OTP has been sent to your email.", 400: "Bad Request"},
@@ -164,7 +161,10 @@ class ForgetPasswordView(APIView):
                 fail_silently=False,
             )
             return Response(
-                {"message": "OTP has been sent to your email."},
+                {
+                    "status": "success", 
+                    "message": "OTP has been sent to your email."
+                },
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -172,7 +172,6 @@ class ForgetPasswordView(APIView):
 
 class VerifyOTPView(APIView):
     permission_classes = [AllowAny]
-
     @swagger_auto_schema(
         request_body=VerifyOTPSerializer,
         responses={
@@ -191,7 +190,7 @@ class VerifyOTPView(APIView):
 
             return Response(
                 {
-                    "message": "OTP verified successfully.",
+                    "status": "succuss",
                     "email": otp_instance.email,
                     "token": otp_instance.reset_token,  # Return the reset token for password reset
                 },
@@ -204,7 +203,6 @@ class VerifyOTPView(APIView):
 
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]
-
     @swagger_auto_schema(
         request_body=ResetPasswordRequestSerializer,
         responses={200: "Password reset successfully.", 400: "Bad Request"},
@@ -219,14 +217,16 @@ class ResetPasswordView(APIView):
             otp_instance = OTP.objects.filter(
                 email=email, reset_token=token, is_verified=True
             ).first()
-            print(otp_instance)
             if otp_instance:
                 user = get_object_or_404(JobSeeker, email=email)
                 user.set_password(new_password)
                 user.save()
                 otp_instance.delete()
                 return Response(
-                    {"message": "Success"},
+                    {
+                        "status": "Success",
+                        "message": "Password changed successfully.",  
+                    },
                     status=status.HTTP_200_OK,
                 )
             else:

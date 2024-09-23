@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate
 from .models import OTP
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import re
+import uuid
 
 
 class JobSeekerSerializer(serializers.ModelSerializer):
@@ -87,9 +88,6 @@ class ForgetPasswordSerializer(serializers.Serializer):
         return value
 
 
-import uuid
-from rest_framework import serializers
-from .models import OTP
 
 class VerifyOTPSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -101,7 +99,6 @@ class VerifyOTPSerializer(serializers.Serializer):
     def validate(self, data):
         email = data.get("email")
         otp = data.get("otp")
-
         # Check if an OTP instance exists and is not yet verified
         if not OTP.objects.filter(email=email, otp=otp, is_verified=False).exists():
             raise serializers.ValidationError("Invalid OTP.")
